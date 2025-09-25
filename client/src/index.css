@@ -1,0 +1,30 @@
+@import "tailwindcss";
+
+@layer utilities{
+    .scrollbar-hidden::-webkit-scrollbar {
+        display: none;
+    }
+}
+.card {
+  width: 100%;
+  max-width: 480px; /* fits large phones */
+  margin: 0 auto;
+  padding: 1rem;
+  background: #bbf7d0; /* green-200 */
+  border-radius: 12px;
+}
+
+/* Small phones */
+@media (max-width: 360px) {
+  .card {
+    font-size: 14px;
+  }
+}
+
+/* Tablets and up */
+@media (min-width: 768px) {
+  .card {
+    font-size: 16px;
+    max-width: 600px;
+  }
+}
