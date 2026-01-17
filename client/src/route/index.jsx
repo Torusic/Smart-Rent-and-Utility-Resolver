@@ -1,5 +1,6 @@
+// src/routes/router.js
 import React from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import App from "../App";
 import RegisterPage from "../pages/RegisterPage";
@@ -12,90 +13,69 @@ import LandLordStatistics from "../Statistics/LandLordStatistics";
 import AddTenants from "../components/Dashboard/AddTenants";
 import ViewTenants from "../components/Dashboard/ViewTenants";
 import UpdateLandLordProfile from "../components/Dashboard/UpdateLandLordProfile";
-import ChatBox from "../components/Dashboard/ChatBox";
+
 import MessageChats from "../ChatElements/MessageChats";
-import TenantDashboard from "../components/Dashboard/TenantDashBoard";
-import TenantStatistics from "../Statistics/TenantStatistics";
+
 import Tenant from "../role/Tenant";
+import TenantStatistics from "../Statistics/TenantStatistics";
 import TenantChats from "../ChatElements/TenantChats";
+import ChatLayout from "../ChatElements/ChatLayout";
+import Welcome from "../components/Welcome";
 
-const router=createBrowserRouter([
+
+
+
+const router = createBrowserRouter([
+  {
+    path: "",
+    element: <App />,
+    children: [
+      { 
+        index:true,
+        element:<Navigate to={'/welcome'} replace/>
+
+      },
+      {
+        path:"/welcome",
+        element:<Welcome/>
+
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+  path: "/landlorddashboard",
+  element: <LandLordDashboard />,
+  children: [
+    { index: true, element: <Landlord /> }, // Default route
+    { path: "landlordstatistics", element: <LandLordStatistics /> },
+    { path: "addtenants", element: <AddTenants /> },
+    { path: "view", element: <ViewTenants /> },
+    { path: "update", element: <UpdateLandLordProfile /> },
     {
-        path:"",
-        element:<App/>,
-        children:[{
-            path:"/register",
-            element:<RegisterPage/>
-
-        },
-        {
-            path:'/login',
-            element:<Login/>
-        },{
-            path:"/landlorddashboard",
-            element:<LandLordDashboard/>,
-            children:[{
-                 path:"landlord",
-            element:<Landlord/>
-
-            },
-        {
-            path:"landlordstatistics",
-            element:<LandLordStatistics/>
-        },
-          {
-            path:"addtenants",
-            element:<AddTenants/>
-        },
-        {
-            path:"view",
-            element:<ViewTenants/>
-        },
-        {
-            path:"update",
-            element:<UpdateLandLordProfile/>
-        },
-        {
-            path:"chat",
-            element:<ChatBox/>,
-            children:[
-                {
-                    path:"chatMessage",
-                    element:<MessageChats/>
-                }
-            ]
-
-        },
-        
-    ]
-            
-        },
-        
-        {
-            path:"/tenantdashboard",
-            element:<TenantDashBoard/>,
-            children:[{
-                path:"tenant",
-                element:<Tenant/>
-            },
-                {
-                path:"tenantstatistics",
-                element:<TenantStatistics/>
-            },
-    {
-      
-          path: "tenantChat",
-          element: <TenantChats />,
-        
-      
+      path: "chat",
+      element: <ChatLayout />,
+      children: [{ path: ":chatId", element: <MessageChats /> }],
     },
- 
-  
-        ]
-        }
-    ]
+  ],
+},
+{
+  path: "/tenantdashboard",
+  element: <TenantDashBoard />,
+  children: [
+    { index: true, element: <Tenant /> },
+    { path: "tenantstatistics", element: <TenantStatistics /> },
+    { path: "tenantChat", element: <TenantChats /> },
+  ],
+}
+,
+    ],
+  },
+]);
 
-    }
-
-])
 export default router;

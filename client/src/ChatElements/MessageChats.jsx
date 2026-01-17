@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { IoSend } from 'react-icons/io5';
+import { IoArrowBack, IoSend } from 'react-icons/io5';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
@@ -79,38 +79,40 @@ const MessageChats = ({ chat }) => {
   }
 
   return (
-    <section className="w-full flex flex-col h-full">
-      <header className="shadow-md border border-white border-b-green-400 py-4 h-10 flex items-center font-semibold">
+    <section className="w-full flex rounded bg-green-100 flex-col">
+      <header className="shadow-md bg-green-200 border border-green-200 px-2  py-4 h-10 flex items-center font-semibold">
+         
         Chat with {chat.name}{' '}
-        <h2 className="italic text-sm text-red-400 px-2 font-light">
+        <h2 className="italic text-sm text-red-400 px-2 gap-2 font-light">
           ({chat.role})
         </h2>
       </header>
 
-      <div className="h-105 overflow-y-auto scrollbar-hidden p-3  ">
+      <div className="lg:h-130 h-120 overflow-y-auto scrollbar-hidden p-3 bg-green-100  ">
         {messages.length ? (
-          messages.map(msg =>
-            msg?._id ? (
-              <div
-                key={msg._id}
-                className={`mb-2 p-2 rounded-ss-xl max-w-xs ${
-                  msg.sender === chat._id
-                    ? 'bg-green-100 text-black self-start'
-                    : 'bg-green-400 text-white ml-auto self-end'
-                }`}
-              >
-                <p className='text-sm text-green-400 italic font-light'>{chat.name}</p>
-                {msg.content}
-              </div>
-            ) : null
-          )
-        ) : (
-          <p className="text-gray-400 text-sm italic">No messages yet...</p>
-        )}
+  messages.map(msg =>
+    msg?._id ? (
+      <div
+        key={msg._id}
+        className={`mb-2 p-3 max-w-xs break-words ${
+          msg.senderModel === "Tenant"
+            ? "bg-white  text-green-900  text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-br-3xl lg:mr-auto ml-2 mr-20 shadow"
+            : "bg-green-500 text-white text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl lg:ml-auto mr-2 ml-20 shadow"
+        }`}
+      >
+        <p className="text-xs text-green-500 italic mb-1">{chat.name}</p>
+        <p>{msg.content}</p>
+      </div>
+    ) : null
+  )
+) : (
+  <p className="text-gray-400 text-sm italic">No messages yet...</p>
+)}
+
         <div ref={messagesEndRef} /> {/* ✅ Scroll target */}
       </div>
-
-      <div className="mt-auto border border-blue-50 flex items-center rounded p-2 bg-blue-50">
+      <div className='p-2 bg-green-200 rounded '>
+        <div className="mt-auto border border-blue-100 flex items-center rounded p-2 bg-blue-100">
         <input
           type="text"
           className="w-full outline-none bg-transparent"
@@ -130,6 +132,9 @@ const MessageChats = ({ chat }) => {
           />
         </button>
       </div>
+      </div>
+
+      
     </section>
   );
 };

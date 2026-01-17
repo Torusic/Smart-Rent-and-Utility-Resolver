@@ -10,7 +10,7 @@ const TenantChats = () => {
   const [input, setInput] = useState("");
   const [landlord, setLandlord] = useState(null);
 
-  const messagesEndRef = useRef(null); // ✅ Ref for auto-scroll
+  const messagesEndRef = useRef(null); 
 
   // Scroll to bottom whenever messages update
   const scrollToBottom = () => {
@@ -21,7 +21,7 @@ const TenantChats = () => {
     scrollToBottom();
   }, [messages]);
 
-  // ✅ Fetch tenant dashboard to get landlord info
+  // Fetch tenant dashboard to get landlord info
   useEffect(() => {
     const fetchTenantDashboard = async () => {
       try {
@@ -38,7 +38,7 @@ const TenantChats = () => {
     fetchTenantDashboard();
   }, []);
 
-  // ✅ Fetch chat history with landlord every 3 seconds
+  // Fetch chat history with landlord every 3 seconds
   useEffect(() => {
     if (!landlord?.id) return;
 
@@ -90,38 +90,45 @@ const TenantChats = () => {
   }
 
   return (
-    <section className="w-full flex flex-col h-full">
-      <header className="shadow-md border border-white border-b-green-400 py-4 h-10 flex items-center font-semibold">
+    <section className="lg:w-full w-89 flex flex-col rounded shadow-md border border-green-100 inset-0 bg-gradient-to-t from-[#D1FAE5]  h-full">
+      <header className="shadow-md bg-green-200 border border-green-100 border-b-green-400 px-2 py-4 h-10 flex items-center font-semibold">
         Chat with
-        <h2 className="italic text-sm text-red-400 px-2 font-light">
-          {landlord.name}(Landlord)
+        <h2 className="italic text-sm text-red-400 px-2 font-semibold">
+          {landlord.name} (Landlord)
         </h2>
       </header>
 
-      <div className="h-105 overflow-y-auto scrollbar-hidden text-white font-semibold p-3 bg-white">
-        {messages.map((msg) => (
-          <div
-            key={msg._id}
-            className={`mb-2 p-2 rounded-ss-xl max-w-xs mr-0 ${
-              msg.senderModel === "Tenant"
-                ? "bg-green-500 ml-auto "
-                : "bg-green-200 text-green-700 mr-auto text-left"
-            }`}
-          >
-            <p className='text-sm text-green-500 italic font-light'>{landlord.name}</p>
-            {msg.content}
-             
-          </div>
-        ))}
-        <div ref={messagesEndRef} /> {/* ✅ Scroll target */}
+     
+           <div className="lg:h-120 h-120 overflow-y-auto scrollbar-hidden p-3 bg-green-100  ">
+        {messages.length ? (
+  messages.map(msg =>
+    msg?._id ? (
+      <div
+        key={msg._id}
+        className={`mb-2 p-3 max-w-xs break-words ${
+          msg.senderModel === "Tenant"
+            ? "bg-green-500  text-white  text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-br-3xl lg:ml-auto mr-2 ml-20 shadow"
+            : "bg-white text-green-900 text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl lg:mr-auto ml-2 mr-20 shadow"
+        }`}
+      >
+        <p className="text-xs text-green-500 italic mb-1">{landlord.name}</p>
+        <p>{msg.content}</p>
       </div>
-
-      <div className="mt-auto border border-blue-50 flex items-center rounded p-2 bg-blue-50">
+    ) : null
+  )
+) : (
+  <p className="text-gray-400 text-sm italic">No messages yet...</p>
+)}
+         <div ref={messagesEndRef} /> {/* ✅ Scroll target */}
+  
+      </div>
+            <div className="px-2 bg-green-100 ">
+         <div className=" border   border-blue-100 flex my-2  text-gray-700 italic items-center   rounded  bg-blue-50">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="w-full outline-none bg-transparent"
+          className="w-full outline-none  p-2 bg-transparent"
           placeholder="Type something..."
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
         />
@@ -131,11 +138,14 @@ const TenantChats = () => {
           disabled={!input.trim()}
         >
           <IoSend
-            size={25}
-            className="text-green-500 cursor-pointer hover:text-green-700"
+            size={30}
+            className="text-green-500 px-2 cursor-pointer hover:text-green-700"
           />
         </button>
       </div>
+       </div>
+       
+     
     </section>
   );
 };

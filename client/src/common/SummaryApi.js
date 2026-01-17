@@ -52,6 +52,11 @@ const SummaryApi = {
   method: "post",
   tenantId,
 }),
+makePayment: {
+  url: "/api/mpesa/stk", // your backend STK Push endpoint
+  method: "post",
+},
+
 
   // Tenant-specific routes
   tenantDashboard: {
@@ -72,6 +77,15 @@ const SummaryApi = {
     url: "/api/LandLord/tenant/markRead",
     method: "put",
   },
+  removeTenant:{
+    url:"/api/LandLord/delete",
+    method:"delete"
+  },
+  getVaccantRooms:{
+    url:"/api/LandLord/vacantRooms",
+    method:"get"
+  }
 };
+
 
 export default SummaryApi;

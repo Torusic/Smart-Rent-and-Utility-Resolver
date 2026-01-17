@@ -6,9 +6,11 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import http from 'http'; // 👈 required for socket.io
 import { Server } from 'socket.io';
+import axios from 'axios';
 
 import connectDB from './config/connectDB.js';
 import LandLordRoute from './routes/LandLord.route.js';
+import mpesaRoute from './routes/mpesa.route.js';
 
 dotenv.config();
 const app = express();
@@ -31,6 +33,7 @@ app.use(
 
 // routes
 app.use('/api/LandLord', LandLordRoute);
+app.use('/api/mpesa',mpesaRoute)
 
 // create http server for socket.io
 const server = http.createServer(app);
@@ -57,7 +60,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('❌ User disconnected:', socket.id);
+    console.log(' User disconnected:', socket.id);
   });
 });
 
@@ -66,7 +69,7 @@ const PORT = process.env.PORT || 8080;
 
 connectDB().then(() => {
   server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(` Server running on port ${PORT}`);
   });
 });
 

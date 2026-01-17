@@ -69,8 +69,9 @@ const RegisterPage = () => {
 
    const validate=Object.values(data).every(el=>el)
   return (
-    <section className='w-full container mt-6 '>
-        <div className='bg-white lg:w-130 w-100 p-7 mx-auto shadow-md  rounded  border border-green-400'>
+    <section className='w-full bg-green-50 container h-screen '>
+        <div className='top-20  sticky'>
+            <div className='bg-green-100 lg:w-130 w-80   p-7 mx-auto shadow-md  rounded  border border-green-400'>
            
            <p className='bg-red-300 w-full   text-red-600 p-2 rounded font-semibold '>Only LandLords can Register</p>
             <p className='flex items-center font-extrabold mt-2 text-green-400'>Welcome to <img src={logo} alt="" width={60} height={60} className='' /></p>
@@ -186,6 +187,8 @@ const RegisterPage = () => {
 
           
         </div>
+        </div>
+        
 
     </section>
       

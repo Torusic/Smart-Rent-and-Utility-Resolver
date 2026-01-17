@@ -61,7 +61,7 @@ const AddTenants = () => {
 
   }
   return (
-  <section className='shadow-md lg:w-full w-70 container mx-auto border  border-green-400 p-6 rounded'>
+  <section className=' lg:w-full w-84 shadow h-165 container mx-auto bg-green-100  p-9 rounded'>
     <h2 className='font-bold text-green-500 '>Add Tenants</h2>
     <form action="" onClick={handleSubmit}>
       <div className='grid'>

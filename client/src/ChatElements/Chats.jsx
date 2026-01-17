@@ -129,8 +129,8 @@ const Chats = ({ onSelectChat, activeChatId }) => {
   }
 
   return (
-    <div className="shadow-md w-80 px-2">
-      <h2 className="font-bold text-sm text-green-400">Chats</h2>
+    <div className="lg:shadow-md h-160 rounded  w-100 bg-green-50 lg:px-2 ml-0 ">
+      <h2 className="font-bold text-sm p-2 text-green-400">Chats</h2>
 
       {/* Search */}
       <div className="bg-blue-50 p-1 rounded mt-7 flex">
@@ -151,12 +151,12 @@ const Chats = ({ onSelectChat, activeChatId }) => {
       </div>
 
       {/* Tenant List */}
-      <div className="h-120 overflow-y-auto scrollbar-hidden bg-green-100 mt-2">
+      <div className="h-120 overflow-y-auto  scrollbar-hidden mt-2">
         {chats.map((chat, index) => (
           <div
             key={chat._id || index}
             onClick={() => handleSelectChat(chat)}
-            className="mt-0 px-2 py-4 rounded border-white cursor-pointer bg-white hover:bg-green-100 hover:text-white border flex justify-between items-center mb-1"
+            className="mt-0 px-2 py-4 rounded border-white bg-white border-b-green-200 cursor-pointer  hover:bg-green-100 hover:text-white border flex justify-between items-center mb-1"
           >
             {/* Left side: tenant info */}
             <div className="flex gap-3 items-center">

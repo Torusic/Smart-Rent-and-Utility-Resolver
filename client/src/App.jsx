@@ -8,7 +8,8 @@ function App() {
   return (
     <>
      
-     <main>
+
+     <main className=''>
       <Outlet/>
      </main>
      <Toaster/>

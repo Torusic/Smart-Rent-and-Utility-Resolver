@@ -32,8 +32,8 @@ const Message = () => {
   }
   
   return (
-    <section className='gap-2 '>
-        <div className='bg-white  mt-4 py-8 px-5 border border-green-400 rounded grid'>
+    <section className='mt-0 '>
+        <div className='bg-green-100 h-80 shadow-md   lg:mt-4 py-8 px-5 lg:w-full text-sm w-88 border border-white lg:border-green-400 rounded grid'>
              <span className='font-semibold bg-green-200 p-2 rounded w-full text-green-600'>Send Updates to Your Tenants</span>
           <label className='font-semibold text-sm flex gap-1 mt-3 mb-2' htmlFor="">Updates <div className='font-thin'>(Optional)</div>:</label>
           <form action="" onSubmit={handleSubmit}>  
