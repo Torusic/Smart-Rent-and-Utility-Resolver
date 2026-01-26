@@ -12,7 +12,22 @@ const tenantSchema = new mongoose.Schema({
 
   // Rent
   rent: { type: Number, default: 0 },
-  rentStatus: { type: String, enum: ["Paid", "Unpaid"], default: "Unpaid" },
+  rentStatus: { 
+    type: String, 
+    enum: ["Paid", "Unpaid", "Partially Paid"], 
+    default: "Unpaid" 
+  },
+ deviceId: {
+  type: String,
+  default: null
+},
+
+relay: {
+  electricity: { type: Boolean, default: false },
+  water: { type: Boolean, default: false }
+},
+
+
 
   // Payment Tracking
   payment: {

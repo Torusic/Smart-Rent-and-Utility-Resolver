@@ -17,10 +17,10 @@ function RentPayment({ close, refreshDashboard, balance }) {
       return toast.error("Enter a valid amount")
     }
 
-    if (amount < balance) {
+  { /** if (amount < balance) {
       return toast.error("Only full payment is allowed")
-    }
-  
+    }*/ 
+  }
 
     setLoading(true)
 

@@ -259,6 +259,7 @@ export async function addTenantController(req, res) {
       rent,
       role: "tenant",
       password: hashpassword,
+      deviceId:`Room ${room}`
     });
 
     const savedTenant = await newTenant.save();
@@ -556,15 +557,26 @@ export async function tenantDashboardController(req, res) {
     const totalRent = tenant.payment?.totalRent || tenant.rent || 0;
     const amountPaid = tenant.payment?.amountPaid || 0;
 
+    let rentStatus = "Unpaid";
+
+        if (totalRent - amountPaid <= 0) {
+          rentStatus = "Paid";
+        } else if (amountPaid > 0) {
+          rentStatus = "Partially Paid";
+        }
+
+       
+
     const dashboardData = {
       name: tenant.name,
       email: tenant.email,
       phone: tenant.phone,
       room: tenant.room,
 
+
       rent: {
         amount: tenant.rent,
-        status: tenant.rentStatus || "Unpaid",
+        status: rentStatus
       },
 
       payment: {

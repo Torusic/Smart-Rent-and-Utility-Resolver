@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import Axios from '../utils/Axios.js'
 import SummaryApi from '../common/SummaryApi.js'
 import AxiosToastError from '../utils/AxiosToastError'
+import socket from '../utils/Socket.js'
 import { IoClose, IoWaterOutline } from 'react-icons/io5'
 import { IoIosBulb } from "react-icons/io"
 import { MdBedroomParent } from 'react-icons/md'
@@ -12,6 +13,7 @@ import { FaStar, FaStarHalfAlt, FaWallet } from 'react-icons/fa'
 import Feedback from '../components/Feedback'
 import RentPayment from '../components/Dashboard/PaymentAction/RentPayment'
 import {LuLoader} from 'react-icons/lu'
+
 
 const TenantStatistics = () => {
   const [broadcast, setBroadcast] = useState(null)
@@ -56,9 +58,32 @@ const TenantStatistics = () => {
   }
 
   useEffect(() => {
-    fetchUpdate()
-    fetchDashboard()
-  }, [])
+  fetchUpdate();
+  fetchDashboard();
+
+  socket.on("statusUpdate", (data) => {
+    // live utility update
+    if (data.room === dashboard.room) {
+      setDashboard((prev) => ({
+        ...prev,
+        utilities: {
+          water: data.water,
+          electricity: data.electricity
+        }
+      }));
+    }
+  });
+
+  socket.on("paymentUpdate", () => {
+    fetchDashboard(); // refresh after M-Pesa payment
+  });
+
+  return () => {
+    socket.off("statusUpdate");
+    socket.off("paymentUpdate");
+  };
+}, []);
+
 
   const handleClose = () => setBroadcast(null)
 
@@ -91,7 +116,7 @@ const TenantStatistics = () => {
       <div className='p-3 inset-0 bg-gradient-to-t from-[#D1FAE5] via-transparent rounded gap-5 bg-green-50 lg:flex justify-between'>
         
         {/* Rent Card */}
-        <div className='lg:h-90 shadow-md h-70 my-2 transform transition duration-500 ease-in-out hover:scale-105 rounded bg-green-100 lg:w-80 w-80 border border-gray-200 cursor-pointer hover:border-green-100'>
+        <div className='lg:h-95 shadow-md h-70 my-2 transform transition duration-500 ease-in-out hover:scale-105 rounded bg-green-100 lg:w-80 w-80 border border-gray-200 cursor-pointer hover:border-green-100'>
           <div className='flex flex-col items-center justify-center mt-2'>
             <span className='text-3xl lg:text-4xl font-bold text-green-400 py-2'>Rent</span>
             <MdBedroomParent size={40} className='text-green-400' />
@@ -117,7 +142,7 @@ const TenantStatistics = () => {
               Last Paid:  <p className='font-semibold'>KES {dashboard.payment?.lastPaidAmount || 0} on {dashboard.payment?.lastPaidAt ? new Date(dashboard.payment.lastPaidAt).toLocaleDateString() : 'N/A'}</p>
             </span>
           </div>
-          <div className='flex justify-center items-center mt-3'>
+          <div className='flex justify-center  items-center mt-3'>
             <button 
               className='bg-green-400 text-sm text-white py-3 font-semibold cursor-pointer px-3 rounded-full w-40'
               onClick={() => setRentModal(true)}
@@ -128,12 +153,12 @@ const TenantStatistics = () => {
         </div>
 
         {/* Electricity Card */}
-        <div className='lg:h-90 h-70 transform transition duration-500 ease-in-out hover:scale-105 bg-yellow-100 mt-4 shadow rounded lg:w-80 w-80 border border-gray-200 cursor-pointer hover:border-yellow-100'>
+        <div className='lg:h-90 h-70 transform gap-4 transition duration-500 ease-in-out hover:scale-105 bg-yellow-100 mt-4 shadow rounded lg:w-80 w-80 border border-gray-200 cursor-pointer hover:border-yellow-100'>
           <div className='flex flex-col items-center justify-center mt-2'>
             <span className='text-3xl lg:text-4xl font-bold text-yellow-400'>Electricity</span>
             <IoIosBulb size={40} className='text-yellow-400' />
           </div>
-          <div className='grid mr-auto lg:mt-6 mt-4 grid gap-2 px-8'>
+          <div className='grid mr-auto lg:mt-6 mt-4  gap-4 px-8'>
             <span className='text-gray-900 text-sm font-bold flex'>
               Status: 
               <p className='bg-yellow-200 text-yellow-500 py-0.5 px-4 mx-2 rounded'>
@@ -157,19 +182,19 @@ const TenantStatistics = () => {
             <span className='text-3xl lg:text-4xl font-bold text-blue-400 py-2'>Water</span>
             <IoWaterOutline size={40} className='text-blue-400' />
           </div>
-          <div className='grid mr-auto mt-6 px-8'>
+          <div className='grid mr-auto gap-4 text-sm font-bold mt-6 px-8'>
             <span className='text-gray-900 text-sm font-bold flex'>
               Status: 
               <p className='bg-blue-200 text-blue-500 text-sm font-semibold py-0.5 px-4 mx-2 rounded'>
                 {dashboard.utilities?.water?.status}
               </p>
             </span>
-            <span className='text-gray-900 text-sm font-semibold'>Amount: KES {dashboard.utilities?.water?.amount || 0}</span>
-            <span className='text-gray-900 text-sm font-semibold'>Units: {dashboard.utilities?.water?.units || 0} m³</span>
-            <span className='text-gray-900 text-sm font-semibold'>Token: {dashboard.utilities?.water?.token || "N/A"}</span>
+            <span className='text-gray-900 text-sm font-bold'>Amount: KES {dashboard.utilities?.water?.amount || 0}</span>
+            <span className='text-gray-900 text-sm font-bold'>Units: {dashboard.utilities?.water?.units || 0} m³</span>
+            <span className='text-gray-900 text-sm font-bold'>Token: {dashboard.utilities?.water?.token || "N/A"}</span>
           </div>
-          <div className='flex justify-center items-center mt-3'>
-            <button className='bg-blue-400 text-sm text-white py-3 font-semibold cursor-pointer px-3 rounded-full w-40'>
+          <div className='flex justify-center p-2 items-center mt-3'>
+            <button className='bg-blue-400 text-sm text-white py-3 font-bold cursor-pointer px-3 rounded-full w-40'>
               Make Payment
             </button>
           </div>

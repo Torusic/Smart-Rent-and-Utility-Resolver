@@ -1,5 +1,6 @@
 import axios from "axios";
 import TenantModel from "../models/Tenant.model.js";
+import { io } from "../server.js";
 
 
 export async function startPayment(req, res) {
@@ -66,7 +67,7 @@ export async function startPayment(req, res) {
 }
 
 
-
+{/** 
 export async function mpesaCallback(req, res) {
   try {
     const data = req.body;
@@ -97,9 +98,14 @@ export async function mpesaCallback(req, res) {
       tenant.payment = tenant.payment || {};
       tenant.payment.amountPaid = (tenant.payment.amountPaid || 0) + amountPaid;
       tenant.payment.balance = (tenant.rent || 0) - tenant.payment.amountPaid;
+          if (tenant.payment.balance <= 0) {
+            tenant.rentStatus = "Paid";
+          } else if (tenant.payment.amountPaid > 0) {
+            tenant.rentStatus = "Partially Paid";
+          } else {
+            tenant.rentStatus = "Unpaid";
+          }
 
-      // Update rent status if fully paid
-      tenant.rentStatus = tenant.payment.balance <= 0 ? "Paid" : "Unpaid";
 
       await tenant.save();
 
@@ -112,6 +118,90 @@ export async function mpesaCallback(req, res) {
     console.error(error);
     return res.status(500).json({ message: "Callback processing failed", error: true });
   }
-}
+}*/}
 
+
+export async function mpesaCallback(req, res) {
+  try {
+    const body = req.body;
+
+    const result =
+      body?.Body?.stkCallback ||
+      body?.stkCallback ||
+      body;
+
+    if (!result || result.ResultCode === undefined) {
+      return res.status(400).json({
+        message: "Invalid callback structure",
+        error: true,
+        success: false
+      });
+    }
+
+    if (result.ResultCode !== 0) {
+      return res.status(400).json({
+        message: "Payment failed or cancelled",
+        error: true,
+        success: false
+      });
+    }
+
+    const items = result.CallbackMetadata?.Item || [];
+    const amount = items.find(i => i.Name === "Amount")?.Value || 0;
+    const receipt = items.find(i => i.Name === "MpesaReceiptNumber")?.Value || "";
+    const phone = items.find(i => i.Name === "PhoneNumber")?.Value || "";
+
+    const tenant = await TenantModel.findById(result.AccountReference);
+
+    if (!tenant) {
+      return res.status(404).json({
+        message: "Tenant not found",
+        error: true,
+        success: false
+      });
+    }
+
+    tenant.payment.amountPaid += amount;
+    tenant.payment.lastPaidAmount = amount;
+    tenant.payment.lastPaidAt = new Date();
+    tenant.payment.balance = tenant.payment.totalRent - tenant.payment.amountPaid;
+
+    if (tenant.payment.balance <= 0) {
+      tenant.rentStatus = "Paid";
+
+      if (!tenant.relay) {
+        tenant.relay = { electricity: false, water: false };
+     }
+
+
+
+      tenant.relay.electricity = true;
+      tenant.relay.water = true;
+
+      io.to(tenant.deviceId).emit("deviceCommand", {
+        electricity: "ON",
+        water: "ON"
+      });
+    }
+
+    await tenant.save();
+
+    io.emit("paymentUpdate", {
+      room: tenant.room,
+      balance: tenant.payment.balance
+    });
+
+    return res.json({
+      message: "Payment processed successfully",
+      success: true
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+      error: true,
+      success: false
+    });
+  }
+}
 

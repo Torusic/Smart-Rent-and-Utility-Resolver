@@ -31,7 +31,7 @@ const ViewVaccant = ({ close }) => {
 
   return (
     <section className='top-0 bottom-0 left-0 right-0 flex items-center justify-center fixed z-50 bg-neutral-950/60'>
-      <div className='bg-white w-88 lg:max-w-md rounded p-2'>
+      <div className='bg-white w-88 mt-7 h-100 lg:max-w-md rounded p-2'>
         <div className='flex justify-between'>
           <h2 className='font-semibold text-sm text-green-400 py-2'>Vacant Rooms</h2>
           <button onClick={close} className='cursor-pointer'><IoClose /></button>

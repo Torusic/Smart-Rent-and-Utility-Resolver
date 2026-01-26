@@ -4,52 +4,52 @@ import { MdBedroomParent } from "react-icons/md";
 import { AiOutlineFileUnknown } from "react-icons/ai";
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
+import socket from '../utils/Socket.js';
 import toast from 'react-hot-toast';
 import AxiosToastError from '../utils/AxiosToastError';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, } from "recharts";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, ScatterChart, Scatter, ZAxis,
+  Line
+} from "recharts";
 import { Link } from 'react-router-dom';
-import { FaArrowRight, FaRobot } from "react-icons/fa";
-import Message from '../components/Message';
-import Divider from '../components/Divider';
 import { SiSimpleanalytics } from "react-icons/si";
 import logo from '../assets/rent.png'
-import About from '../components/About';
+import Divider from '../components/Divider';
 import ViewVaccant from '../components/ViewVaccant.jsx';
-
-
 
 const LandLordStatistics = () => {
   const [stats, setStats] = useState(null);
-  const[viewVaccants,setViewVaccants]=useState(false)
-
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const response = await Axios({
-          ...SummaryApi.landlordDashboard,
-
-        })
-        if (response.data.error) {
-          toast.error(response.data.error)
-        }
-        if (response.data.success) {
-          toast.success(response.data.message)
-          setStats(response.data.data)
-        }
-
-      } catch (error) {
-        AxiosToastError(error)
-
-      }
-
+  const [viewVaccants, setViewVaccants] = useState(false)
+useEffect(() => {
+  const fetchDashboard = async () => {
+    try {
+      const response = await Axios({ ...SummaryApi.landlordDashboard })
+      if (response.data.success) setStats(response.data.data)
+    } catch (error) {
+      AxiosToastError(error)
     }
-    fetchDashboard()
+  };
 
-  }, [])
+  fetchDashboard();
 
-  if (!stats) {
-    return <div className="p-6 text-center">Loading statistics...</div>;
-  }
+  socket.on("statusUpdate", () => {
+    fetchDashboard(); // refresh charts live
+  });
+
+  socket.on("paymentUpdate", () => {
+    fetchDashboard();
+  });
+
+  return () => {
+    socket.off("statusUpdate");
+    socket.off("paymentUpdate");
+  };
+}, []);
+
+
+  if (!stats) return <div className=" text-center">Loading statistics...</div>;
+
   const chartData = [
     { name: "Rent Paid", value: stats.utiliytiesGraph.rent.paid },
     { name: "Rent Unpaid", value: stats.utiliytiesGraph.rent.unpaid },
@@ -58,87 +58,88 @@ const LandLordStatistics = () => {
     { name: "Electricity Paid", value: stats.utiliytiesGraph.electricity.paid },
     { name: "Electricity Unpaid", value: stats.utiliytiesGraph.electricity.unpaid },
   ]
+
+  const scatterData = [
+    { x: 1, y: stats.utiliytiesGraph.rent.paid, z: 200, name: "Rent Paid" },
+    { x: 2, y: stats.utiliytiesGraph.rent.unpaid, z: 200, name: "Rent Unpaid" },
+    { x: 3, y: stats.utiliytiesGraph.water.paid, z: 200, name: "Water Paid" },
+    { x: 4, y: stats.utiliytiesGraph.water.unpaid, z: 200, name: "Water Unpaid" },
+    { x: 5, y: stats.utiliytiesGraph.electricity.paid, z: 200, name: "Electricity Paid" },
+    { x: 6, y: stats.utiliytiesGraph.electricity.unpaid, z: 200, name: "Electricity Unpaid" },
+  ]
+
   return (
-    <div className='bg-green-50  p-4 h-full overflow-x-auto  scrollbar-hidden rounded '>
-     <img src={logo} alt="" className='mt-2 py-2 lg:hidden rounded-2xl'/>
-      <div className='flex items-center p-2 lg:gap-20 gap-5 inset-0 bg-gradient-to-t from-[#D1FAE5] via-transparent '>
-        <div className='shadow-sm bg-green-200 lg:gap-3 gap-2 flex flex-col p-4 rounded items-center  lg:h-40 h-27 lg:w-90 w-100    ' >
-          <div className='lg:font-bold font-semibold text-sm text-green-400 hover:bg-green-200 rounded cursor-pointer p-1'> Rooms</div>
-          <div className='font-bold lg:text-3xl text-sm justify-center text-green-400'>{stats.totalRooms}</div>
-
-            <Link className='block w-fit ml-auto   px-3 py-1 ' to={"/landlorddashboard/update"}>< LuHousePlus className='text-green-400'  /></Link>
-        
-
-        </div>
-        <div className='shadow-sm bg-green-200  lg:gap-3 gap-2 flex flex-col p-4 rounded items-center  lg:h-40 h-27 lg:w-90  ' >
-          <div className='lg:font-bold font-semibold text-sm text-green-400 hover:bg-green-200 rounded cursor-pointer p-1'> Rented</div>
-          <div className='font-bold lg:text-3xl text-sm justify-center text-green-400'>{stats.rentedRooms}</div>
-
-          <button className='block w-fit ml-auto  px-3 py-1 '>
-            < MdBedroomParent className='text-green-400'  />
-          </button>
-
-        </div>
-        <div className='shadow-sm bg-green-200  lg:gap-3 gap-2 flex flex-col p-4 rounded items-center  lg:h-40  h-27 lg:w-90    ' >
-          <button className='lg:font-bold font-semibold text-sm text-green-400 hover:bg-green-200 rounded cursor-pointer p-1' onClick={()=>setViewVaccants(true)}> Vaccants</button>
-          <div className='font-bold lg:text-3xl text-sm justify-center text-green-400'>{stats.vacantRooms}</div>
-
-          <button className='block w-fit ml-auto  px-3 py-1 '>
-            < AiOutlineFileUnknown className='text-green-400'  />
-          </button>
-
+    <div className='bg-green-50     flex justify-between  h-full scrollbar-hidden rounded  overflow-x-auto '>
+     
+      {/* Summary Cards */}
+      <div className='flex  items-center  justify-between bg-gradient-to-t from-[#D1FAE5] via-transparent'>
+        <div className='grid '>
+          <div className='lg:flex grid  justify-between bg-gradient-to-t from-[#D1FAE5] via-transparent items-center py-18 px-5 gap-6 lg:gap-35'>
+            
+            <div className='bg-green-200 flex flex-col p-4 rounded items-center h-35 w-80'>
+          <div className='font-semibold text-sm text-green-400'>Rooms</div>
+          <div className='font-bold text-2xl text-green-400'>{stats.totalRooms}</div>
+          <Link to="/landlorddashboard/update"><LuHousePlus className='text-green-400' /></Link>
         </div>
 
-
-      </div>
-      <div className='mt-3 border border-white'>
-        <Divider/>
-      </div>
-      <div className='bg-green-50 '>
-      
-        
-           <div className='flex mt-10 font-extralight inset-0 bg-gradient-to-t from-[#D1FAE5] via-transparent   gap-4'>
-        <div className='w-900 lg:w-full  lg:shadow border border-white lg:border-green-100 lg:px-2 rounded '>
-          <h2 className='font-semibold py-3 flex justify-between'>Utilities Payment Status (%) <SiSimpleanalytics className='text-green-400' /></h2>
-          <ResponsiveContainer width="100%" height={400}>
-  <BarChart data={chartData} className="border border-white">
-    <CartesianGrid strokeDasharray="3 3" />
-    <XAxis
-      dataKey="name"
-      className="font-extralight text-sm"
-      interval={0}               
-      tick={{ fontSize: 9}}    
-      angle={-30}               
-      textAnchor="end"          
-    />
-    <YAxis className="font-extralight text-sm" unit="%" />
-    <Tooltip />
-    <Bar dataKey="value" fill="#22c55e" radius={[3, 3, 0, 0]} />
-
-  </BarChart>
-</ResponsiveContainer>
-
-
+        <div className='bg-green-200 flex flex-col p-4 rounded items-center h-35 w-80'>
+          <div className='font-semibold text-sm text-green-400'>Rented</div>
+          <div className='font-bold text-2xl text-green-400'>{stats.rentedRooms}</div>
+          <MdBedroomParent className='text-green-400' />
         </div>
 
+        <div className='bg-green-200 flex flex-col p-4 rounded items-center h-35 w-80'>
+          <button className='font-semibold text-sm text-green-400' onClick={() => setViewVaccants(true)}>Vacants</button>
+          <div className='font-bold text-2xl text-green-400'>{stats.vacantRooms}</div>
+          <AiOutlineFileUnknown className='text-green-400' />
+        </div>
+          </div>
+          
+        <Divider />
 
+      {/* Bar Chart */}
+      <p className='text-green-400  w-fit p-2 ml-auto'> <SiSimpleanalytics  /></p>
+      <div className='flex justify-between p-3  gap-3'>
+       
+        <div className='mt-8 bg-gradient-to-t w-full h-75 from-[#D1FAE5] via-transparentp-4 rounded shadow'>
+        <h2 className='font-semibold mb-3 flex justify-between'>
+          Utilities Payment Bar Chart 
+        </h2>
+        <ResponsiveContainer width="100%" height={250}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" angle={-30} textAnchor="end" tick={{ fontSize: 10 }} />
+            <YAxis unit="%" />
+            <Tooltip />
+            <Bar dataKey="value" fill="#22c55e" radius={[5,5,0,0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Scatter Chart */}
+      <div className='mt-8 bg-gradient-to-t w-full h-75 from-[#D1FAE5] via-transparent p-4 rounded shadow'>
+        <h2 className='font-semibold mb-3'>Utilities Scatter Distribution</h2>
+        <ResponsiveContainer width="100%" height={250}>
+          <ScatterChart>
+            <CartesianGrid />
+            <XAxis type="number" dataKey="x" name="Utility Index" />
+            <YAxis type="number" dataKey="y" name="Payment %" unit="%" />
+            <ZAxis type="number" dataKey="z" range={[100, 400]} />
+            <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+            <Scatter name="Payments" data={scatterData} fill="#22c55e" />
+          </ScatterChart>
+        </ResponsiveContainer>
       </div>
       </div>
-   
-      {
-        viewVaccants && (
-          <ViewVaccant close={()=>setViewVaccants(false)}/>
-        )
-      }
       
 
+      {viewVaccants && <ViewVaccant close={() => setViewVaccants(false)} />}
+        </div>
+        
+      </div>
+
+      
     </div>
-    
-
-
-
-
-
   )
 }
 
