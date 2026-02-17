@@ -1,143 +1,158 @@
-import React, { useEffect, useState } from 'react'
-import Message from '../Message'
-import AxiosToastError from '../../utils/AxiosToastError'
-import Axios from '../../utils/Axios'
-import SummaryApi from '../../common/SummaryApi'
-import toast from 'react-hot-toast'
+import React, { useEffect, useState } from 'react';
+import Message from '../Message';
+import AxiosToastError from '../../utils/AxiosToastError';
+import Axios from '../../utils/Axios';
+import SummaryApi from '../../common/SummaryApi';
+import toast from 'react-hot-toast';
+import Divider from '../Divider';
 
-const UpdateLandLordProfile = ({dark}) => {
-    const[landlordData,setLandlordData]=useState({
-        name:"",
-        email:"",
-        phone:"",
-        totalRooms:""
-    })
+const UpdateLandLordProfile = ({ dark }) => {
+  const [landlordData, setLandlordData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    totalRooms: ''
+  });
+  const[nameText,setNameText]=useState(false)
+   const[phoneText,setPhoneText]=useState(false)
+    const[emailText,setEmailText]=useState(false)
+     const[roomText,setRoomText]=useState(false)
 
-    useEffect(()=>{
-        const fetchLandlordDetails=async()=>{
-            try {
-                const response=await Axios({
-                    ...SummaryApi.landlord,
-                 
-                })
-                const{data:responseData}=response
+  useEffect(() => {
+    const fetchLandlordDetails = async () => {
+      try {
+        const response = await Axios({ ...SummaryApi.landlord });
+        const { data: responseData } = response;
 
-                if(responseData.success){
-                    toast.success(responseData.message)
-                    setLandlordData(responseData.data)
-                }
-                
-                
-            } catch (error) {
-                AxiosToastError(error)
-                
-            }
-
+        if (responseData.success) {
+          toast.success(responseData.message);
+          setLandlordData(responseData.data);
         }
-        fetchLandlordDetails()
+      } catch (error) {
+        AxiosToastError(error);
+      }
+    };
+    fetchLandlordDetails();
+  }, []);
 
-    },[])
-const handleChange=(e)=>{
-    const{name,value}=e.target
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setLandlordData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    setLandlordData((preve)=>{
-        return{
-            ...preve,
-            [name]:value
-        }  
-    })
-}
-const handleSubmit=async(e)=>{
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-        const response=await Axios({
-            ...SummaryApi.update,
-            data:landlordData
-
-        })
-        const{data:responseData}=response
-        if(responseData.success){
-            toast.success(responseData.message)
-
-            if(responseData.data){
-                setLandlordData(responseData.data)
-
-            }
-            
-        }
-
-        
+      const response = await Axios({
+        ...SummaryApi.update,
+        data: landlordData
+      });
+      const { data: responseData } = response;
+      if (responseData.success) {
+        toast.success(responseData.message);
+        if (responseData.data) setLandlordData(responseData.data);
+      }
     } catch (error) {
-        AxiosToastError()
-        
+      AxiosToastError(error);
     }
-}
+  };
+ 
+
+  
 
   return (
-   <section className=' overflow-y-auto scrollbar-hidden p-3  ' >
-    <div className='bg-green-100 shadow-md text-sm h-70 py-10 lg:w-full w-88 px-4 border border-white lg:border-green-400 rounded'>
-        <span className='font-semibold  bg-green-200 p-2 rounded w-full text-green-600'>Update My Profile</span>
-        <form action="" onSubmit={handleSubmit}><div className='lg:flex grid lg:gap-10 text-sm gap-2 px-2 justify-between'>
-        <div className='grid mt-5 gap-2'> 
-            <label className='font-semibold text-sm' htmlFor="">Name:</label>
-            <input type="name"
-             id='name'
-            name='name'
-            className='bg-blue-50 outline-none rounded lg:w-90 w-78 p-1 border font-semibold text-gray-500 hover:text-black  border-blue-50'
-            onChange={handleChange}
-            value={landlordData.name}
+    <section className="overflow-y-auto scrollbar-hidden p-4 bg-gray-50 h-full">
+      <div className={`max-w-7xl mx-auto bg-white  rounded-2xl p-8 
+                      transition-all duration-500 `}>
+        <h2 className="text-2xl font-bold text-green-600 mb-6 text-center">
+          Update My Profile
+        </h2>
 
-            />
-        </div>
-        <div className='grid mt-3 gap-2'>
-            <label className='font-semibold text-sm' htmlFor="">Email:</label>
-            <input type="email"
-            id='email'
-            name='email'
-            className='bg-blue-50 outline-none rounded lg:w-90 w-78 p-1 font-semibold text-gray-500 hover:text-black border  border-blue-50'
-             onChange={handleChange}
-               value={landlordData.email}
-               required
-            />
-        </div>
-        <div className='grid mt-3 gap-2'>
-            <label className='font-semibold text-sm' htmlFor="">Phone:</label>
-            <input type="tel"
-            id='phone'
-            name='phone'
-            className='bg-blue-50 outline-none rounded lg:w-90 w-78 p-1 font-semibold text-gray-500 hover:text-black border  border-blue-50'
-             onChange={handleChange}
-               value={landlordData.phone}
-            />
-        </div>
-    </div>
-    <div className=' grid text-sm lg:flex px-2 mt-5 gap-0.01 lg:gap-18'>
-        <div className=' grid mt-3 gap-2'>
-            <label className='font-semibold text-sm' htmlFor="">Number of Rooms:</label>
-            <input type="Number"
-            id='totalRooms'
-            name='totalRooms'
-            className='bg-blue-50 outline-none rounded lg:w-90 w-78 font-semibold text-gray-500 hover:text-black p-1 border border-blue-50'
-             onChange={handleChange}
-               value={landlordData.totalRooms}
-            />
-        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* Name + Email */}
+          <div className="flex flex-col md:flex-row text-gray-400 gap-6">
+            <div className="flex flex-col flex-1">
+              <label className="font-medium text-gray-700 mb-1">Name</label>
+              <input
+                type="text"
+                name="name"
+                value={landlordData.name}
+                onChange={handleChange}
+                 onClick={()=>setNameText(true)}
+                className={`p-3 ${nameText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                placeholder="Enter your name"
+              />
+            </div>
 
-        <div className='mt-12 grid '>
-            <button className='bg-green-600 px-3 py-1 rounded  lg:w-90 w-78 cursor-pointer text-white font-semibold'>Update</button>
-        </div>
-    </div>     
+            <div className="flex flex-col flex-1 text-gray-400">
+              <label className="font-medium  text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={landlordData.email}
+                onChange={handleChange}
+                onClick={()=>setEmailText(true)}
+                className={`p-3 ${emailText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Phone + Total Rooms */}
+          <div className="flex flex-col md:flex-row text-gray-400 gap-6">
+            <div className="flex flex-col flex-1">
+              <label className="font-medium text-gray-700 mb-1">Phone</label>
+              <input
+                type="tel"
+                name="phone"
+                value={landlordData.phone}
+                onChange={handleChange}
+                 onClick={()=>setPhoneText(true)}
+                className={`p-3 ${phoneText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                placeholder="Enter phone number"
+              />
+            </div>
+
+            <div className="flex flex-col flex-1 text-gray-400">
+              <label className="font-medium text-gray-700 mb-1">Number of Rooms</label>
+              <input
+                type="number"
+                name="totalRooms"
+                value={landlordData.totalRooms}
+                onChange={handleChange}
+           
+                onClick={()=>setRoomText(true)}
+                className={`p-3 ${roomText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                placeholder="Enter total rooms"
+              />
+            </div>
+          </div>
+
+          {/* Update Button */}
+          <button
+            type="submit"
+            className="bg-green-600 text-white font-semibold py-3 rounded-lg w-full 
+                       hover:bg-green-700 hover:scale-[1.02] active:scale-95 transition-all shadow-md"
+                       onClick={()=>{
+                        setNameText(false)
+                        setEmailText(false)
+                        setPhoneText(false)
+                        setRoomText(false)
+                       }}
+          >
+            Update Profile
+          </button>
         </form>
+      </div>
+      <Divider />
 
-    </div>
+      {/* Messages Section */}
+      <div className="mt-8">
+        <Message />
+      </div>
+    </section>
+  );
+};
 
-    <Message/>
-
-
-
-
-   </section>
-  )
-}
-
-export default UpdateLandLordProfile
+export default UpdateLandLordProfile;

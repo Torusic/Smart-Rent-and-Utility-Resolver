@@ -22,7 +22,7 @@ const Landlord = ({ onLogout, closeMenu }) => {
   ];
 
   return (
-    <ul className="space-y-2 p-4 bg-green-50 ">
+    <ul className="space-y-2 z-50 p-4 bg-white h-full ">
       {menu.map((item, i) => {
         const isActive = item.path && location.pathname.startsWith(item.path);
 

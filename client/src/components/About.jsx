@@ -5,7 +5,7 @@ export default function About() {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <main className="lg:w-full w-89 mx-auto shadow-md   p-6 bg-green-100 object-  rounded-md">
+    <main className="lg:w-full w-89 mx-auto mt-3  p-6 bg-green-50 object-  rounded-md">
       <header className="mb-6">
         <h1 className="text-sm lg:text-2xl font-semibold text-gray-800">About Smart Rent & Utility Resolver</h1>
         <p className="mt-2 text-sm text-gray-600">

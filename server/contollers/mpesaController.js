@@ -43,7 +43,7 @@ export async function startPayment(req, res) {
         PartyB: landlordShortcode,
         PhoneNumber: `254${phone}`,
         CallBackURL: "https://yourdomain.com/api/mpesa/callback",
-        AccountReference: tenant._id.toString(), // important!
+        AccountReference: tenant._id.toString(), 
         TransactionDesc: "House Rent"
       },
       {

@@ -1,17 +1,46 @@
 import mongoose from "mongoose";
 
 const tenantSchema = new mongoose.Schema({
-  landlord: { type: mongoose.Schema.Types.ObjectId, ref: "LandLord", required: true },
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  phone: { type: String, required: true, length: 10 },
-  password: { type: String, required: true },
-  refresh_token: { type: String, default: null },
-  room: { type: String },
-  role: { type: String, default: "tenant" },
+  landlord: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: "LandLord",
+     required: true
+     },
+  name: { 
+    type: String, 
+    required: true 
+  },
+  email: { 
+    type: String,
+     required: true,
+      unique: true
+     },
+  phone: { 
+    type: String, 
+    required: true,
+     length: 10
+     },
+  password: {
+     type: String,
+      required: true
+     },
+  refresh_token: { 
+    type: String, 
+    default: null
+   },
+  room: { 
+    type: String
+   },
+  role: { 
+    type: String, 
+    default: "tenant"
+   },
 
   // Rent
-  rent: { type: Number, default: 0 },
+  rent: { 
+    type: Number,
+     default: 0 
+    },
   rentStatus: { 
     type: String, 
     enum: ["Paid", "Unpaid", "Partially Paid"], 
@@ -23,43 +52,98 @@ const tenantSchema = new mongoose.Schema({
 },
 
 relay: {
-  electricity: { type: Boolean, default: false },
-  water: { type: Boolean, default: false }
+  electricity: { 
+    type: Boolean,
+     default: false },
+  water: { 
+    type: Boolean,
+     default: false
+     }
 },
 
-
-
-  // Payment Tracking
+ // Payment Tracking
   payment: {
-    totalRent: { type: Number, default: 0 },
-    amountPaid: { type: Number, default: 0 },
-    balance: { type: Number, default: 0 },
-    lastPaidAmount: { type: Number, default: 0 },
-    lastPaidAt: { type: Date }
+    totalRent: { 
+      type: Number,
+       default: 0 
+      },
+    amountPaid: {
+       type: Number,
+        default: 0 
+      },
+    balance: {
+       type: Number, 
+       default: 0 
+      },
+    lastPaidAmount: { 
+      type: Number, 
+      default: 0 
+    },
+    lastPaidAt: {
+       type: Date 
+      }
   },
 
   // Utilities
   utilities: {
-    waterStatus: { type: String, enum: ["Paid", "Unpaid"], default: "Unpaid" },
+    waterStatus: {
+       type: String,
+        enum: ["ON", "OFF"],
+         default: "ON"
+         },
     water: {
-      units: { type: Number, default: 0 },
-      amount: { type: Number, default: 0 },
-      token: { type: String, default: "" },
+      units: {
+         type: Number,
+          default: 0 
+        },
+      amount: { 
+        type: Number,
+         default: 0 
+        },
+      token: { 
+        type: String, 
+        default: "" 
+      },
     },
 
-    electricityStatus: { type: String, enum: ["Paid", "Unpaid"], default: "Unpaid" },
+    electricityStatus: { 
+      type: String, 
+      enum: ["ON", "OFF"],
+       default: "ON" 
+      },
     electricity: {
-      units: { type: Number, default: 0 },
-      amount: { type: Number, default: 0 },
-      token: { type: String, default: "" },
+      units: { 
+        type: Number,
+         default: 0
+         },
+      amount: {
+         type: Number,
+          default: 0
+         },
+      token: { 
+        type: String,
+         default: "" 
+        },
     },
   },
 
   messages: [{
-    content: { type: String, required: true },
-    date: { type: Date, default: Date.now },
-    read: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now },
+    content: {
+       type: String, 
+       required: true 
+      },
+    date: {
+       type: Date,
+        default: Date.now
+       },
+    read: { 
+      type: Boolean,
+       default: false 
+      },
+    createdAt: { 
+      type: Date, 
+      default: Date.now 
+    },
   }],
 
   lastPayment: { type: Date },

@@ -21,6 +21,7 @@ import TenantStatistics from "../Statistics/TenantStatistics";
 import TenantChats from "../ChatElements/TenantChats";
 import ChatLayout from "../ChatElements/ChatLayout";
 import Welcome from "../components/Welcome";
+import UpdateTenantPassword from "../components/Dashboard/updateTenantPassword";
 
 
 
@@ -69,8 +70,10 @@ const router = createBrowserRouter([
   element: <TenantDashBoard />,
   children: [
     { index: true, element: <Tenant /> },
+    { path:"updatePassword",element:<UpdateTenantPassword/>},
     { path: "tenantstatistics", element: <TenantStatistics /> },
     { path: "tenantChat", element: <TenantChats /> },
+    
   ],
 }
 ,

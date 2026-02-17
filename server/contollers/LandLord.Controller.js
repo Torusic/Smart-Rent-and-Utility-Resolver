@@ -12,6 +12,7 @@ import sndSMS from "../utils/sndSMS.js";
 import bcrypt from "bcryptjs";
 import { response } from "express";
 import MessageModel from "../models/Message.model.js";
+import axios from "axios";
 
 
 export async function registerController(req,res){
@@ -644,8 +645,8 @@ export async function getAllTenantsController(req, res) {
       });
     }
 
-    // Get all tenants
-    const tenants = await TenantModel.find({ landlord: LandLordId }).sort({ createdAt: -1 });
+    const tenants = await TenantModel.find({ landlord: LandLordId })
+      .sort({ createdAt: -1 });
 
     if (!tenants || tenants.length === 0) {
       return res.status(400).json({
@@ -655,9 +656,12 @@ export async function getAllTenantsController(req, res) {
       });
     }
 
-    // Attach last message + calculate payment info for each tenant
+    let totalExpected = 0;
+    let totalPaid = 0;
+
     const tenantsWithDetails = await Promise.all(
       tenants.map(async (tenant) => {
+
         const lastMessage = await MessageModel.findOne({
           $or: [
             { sender: LandLordId, receiver: tenant._id },
@@ -665,14 +669,24 @@ export async function getAllTenantsController(req, res) {
           ],
         }).sort({ createdAt: -1 });
 
-        // Payment calculations
+        const unreadCount = await MessageModel.countDocuments({
+          sender: tenant._id,
+          receiver: LandLordId,
+          read: false,
+        });
+
         const totalRent = tenant.payment?.totalRent || tenant.rent || 0;
         const amountPaid = tenant.payment?.amountPaid || 0;
         const balance = totalRent - amountPaid;
 
+        // 🔥 accumulate apartment totals
+        totalExpected += totalRent;
+        totalPaid += amountPaid;
+
         return {
           ...tenant.toObject(),
           lastMessage: lastMessage || null,
+          unreadCount,
           payment: {
             totalRent,
             amountPaid,
@@ -684,12 +698,22 @@ export async function getAllTenantsController(req, res) {
       })
     );
 
+    const totalUnpaid = totalExpected - totalPaid;
+
     return res.status(200).json({
       message: `${landlord.name}'s tenants found`,
       error: false,
       success: true,
       tenants: tenantsWithDetails,
+
+      
+      apartmentSummary: {
+        totalExpected,
+        totalPaid,
+        totalUnpaid,
+      },
     });
+
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
@@ -698,6 +722,7 @@ export async function getAllTenantsController(req, res) {
     });
   }
 }
+
 
 
 export async function updateLandlordController(req, res) {
@@ -769,6 +794,38 @@ export async function landlordDetails(req,res){
         
     }
 }
+export const manageUtilities = async (req, res) => {
+  try {
+    const { tenantId, electricity, water } = req.body;
+
+    const tenant = await TenantModel.findById(tenantId);
+    if (!tenant) {
+      return res.status(404).json({ message: "Tenant not found" });
+    }
+
+    if (electricity) {
+      tenant.relay.electricity = electricity === "ON";
+      tenant.utilities.electricityStatus = electricity;
+    }
+
+    if (water) {
+      tenant.relay.water = water === "ON";
+      tenant.utilities.waterStatus = water;
+    }
+
+    await tenant.save();
+
+    res.json({
+      success: true,
+      message: "Utility updated"
+    });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export async function sendMessageToTenants(req,res){
     try {
         const LandLordId=req.userId;
@@ -812,6 +869,59 @@ export async function sendMessageToTenants(req,res){
         
     }
 
+}
+export async function tenantPasswordUpdate(req,res){
+  try {
+    const tenantId=req.userId;
+    const {currentPassword, newPassword}=req.body;
+
+    if(!currentPassword || !newPassword){
+      return res.status(400).json({
+        message:"All fields are required",
+        error:true,
+        success:false
+      })
+    }
+    const tenant=await TenantModel.findById(tenantId);
+
+    if(!tenant){
+      return res.status(400).json({
+        message:"No tenant found",
+        error:true,
+        success:false
+      })
+    }
+    const isMatch=await bcryptjs.compare(currentPassword,tenant.password);
+    if(!isMatch){
+      return res.status(400).json({
+        message:"Current password is incorrect(It should be the passowrd sent to your email during registration)",
+        error:true,
+        success:false,
+        
+      })
+    }
+    const salt=await bcryptjs.genSalt(10);
+    const hashedPassword=await bcryptjs.hash(newPassword,salt)
+
+    tenant.password=hashedPassword;
+    await tenant.save()
+
+    return res.status(200).json({
+      message:"Password Updated successfully",
+      error:false,
+      success:true,
+      data:tenant
+      
+    })
+    
+  } catch (error) {
+    return res.status(500).json({
+      message:error.message || error,
+      success:false,
+      error:true
+    })
+    
+  }
 }
 // Inside LandLord.Controller.js
 

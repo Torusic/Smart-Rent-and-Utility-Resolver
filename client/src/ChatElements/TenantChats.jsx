@@ -10,63 +10,56 @@ const TenantChats = () => {
   const [input, setInput] = useState("");
   const [landlord, setLandlord] = useState(null);
 
-  const messagesEndRef = useRef(null); 
+  const scrollRef = useRef(null);
 
-  // Scroll to bottom whenever messages update
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
+  // Auto-scroll to bottom when messages update
   useEffect(() => {
-    scrollToBottom();
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   }, [messages]);
 
-  // Fetch tenant dashboard to get landlord info
+  // Fetch landlord info
   useEffect(() => {
     const fetchTenantDashboard = async () => {
       try {
         const { url, method } = SummaryApi.tenantDashboard;
         const { data } = await Axios({ url, method });
         if (data.success && data.data.landlord) {
-          setLandlord(data.data.landlord); // landlord has id, name, phone
+          setLandlord(data.data.landlord);
         }
       } catch (error) {
         console.error("Error fetching tenant dashboard:", error);
       }
     };
-
     fetchTenantDashboard();
   }, []);
 
-  // Fetch chat history with landlord every 3 seconds
+  // Fetch chat history every 3 seconds
   useEffect(() => {
     if (!landlord?.id) return;
-
     const fetchMessages = async () => {
       try {
         const { url, method } = SummaryApi.getTenantChats(landlord.id);
         const { data } = await Axios({ url, method });
-        if (data.success) {
-          setMessages(data.data);
-        }
+        if (data.success) setMessages(data.data);
       } catch (error) {
         console.error("Error fetching messages:", error);
       }
     };
-
     fetchMessages();
     const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
   }, [landlord]);
 
-  // ✅ Send message to landlord
   const handleSend = async () => {
-    if (!landlord?.id || !input.trim()) return; // guard
-
+    if (!landlord?.id || !input.trim()) return;
     try {
       const { url, method } = SummaryApi.sendChatToLandlord(landlord.id);
       const payload = { landlordId: landlord.id, content: input.trim() };
-
       const response = await Axios({ url, method, data: payload });
 
       if (response.data.success) {
@@ -83,69 +76,64 @@ const TenantChats = () => {
 
   if (!landlord) {
     return (
-      <div className="p-4 text-gray-500 italic">
-        Loading chat with your landlord...
-      </div>
+      <div className="p-4 text-gray-500 italic">Loading chat with your landlord...</div>
     );
   }
 
   return (
-    <section className="lg:w-full w-89 flex flex-col rounded shadow-md border border-green-100 inset-0 bg-gradient-to-t from-[#D1FAE5]  h-full">
-      <header className="shadow-md bg-green-200 border border-green-100 border-b-green-400 px-2 py-4 h-10 flex items-center font-semibold">
-        Chat with
-        <h2 className="italic text-sm text-red-400 px-2 font-semibold">
-          {landlord.name} (Landlord)
-        </h2>
+    <section className="max-w-9xl mx-auto mt-4 flex flex-col mb-6 h-[600px] rounded-2xl shadow-lg border border-green-200 overflow-hidden bg-gradient-to-t from-[#D1FAE5]">
+      
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-green-100 border-b border-green-300 px-4 py-3 flex items-center font-semibold shadow-sm">
+        Chat with <span className="italic text-red-500 ml-2">{landlord.name} (Landlord)</span>
       </header>
 
-     
-           <div className="lg:h-120 h-120 overflow-y-auto scrollbar-hidden p-3 bg-green-100  ">
-        {messages.length ? (
-  messages.map(msg =>
-    msg?._id ? (
+      {/* Messages Area */}
       <div
-        key={msg._id}
-        className={`mb-2 p-3 max-w-xs break-words ${
-          msg.senderModel === "Tenant"
-            ? "bg-green-500  text-white  text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-br-3xl lg:ml-auto mr-2 ml-20 shadow"
-            : "bg-white text-green-900 text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl lg:mr-auto ml-2 mr-20 shadow"
-        }`}
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto p-4 space-y-3 bg-green-50 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100"
       >
-        <p className="text-xs text-green-500 italic mb-1">{landlord.name}</p>
-        <p>{msg.content}</p>
+        {messages.length ? (
+          messages.map((msg) =>
+            msg?._id ? (
+              <div
+                key={msg._id}
+                className={`p-3 max-w-xs break-words text-sm font-medium ${
+                  msg.senderModel === "Tenant"
+                    ? "bg-green-500 text-white rounded-tr-3xl rounded-tl-3xl rounded-br-3xl ml-auto shadow"
+                    : "bg-white text-green-900 rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl mr-auto shadow"
+                }`}
+              >
+                {msg.senderModel !== "Tenant" && (
+                  <p className="text-xs italic text-green-500 mb-1">{landlord.name}</p>
+                )}
+                <p>{msg.content}</p>
+              </div>
+            ) : null
+          )
+        ) : (
+          <p className="text-gray-400 italic text-sm">No messages yet...</p>
+        )}
       </div>
-    ) : null
-  )
-) : (
-  <p className="text-gray-400 text-sm italic">No messages yet...</p>
-)}
-         <div ref={messagesEndRef} /> {/* ✅ Scroll target */}
-  
-      </div>
-            <div className="px-2 bg-green-100 ">
-         <div className=" border   border-blue-100 flex my-2  text-gray-700 italic items-center   rounded  bg-blue-50">
+
+      {/* Input Area */}
+      <div className="bg-green-100 p-3 flex items-center gap-2 border-t border-green-200">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          className="w-full outline-none  p-2 bg-transparent"
-          placeholder="Type something..."
+          placeholder="Type a message..."
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
+          className="flex-1 p-3 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500"
         />
         <button
           onClick={handleSend}
-          className="ml-2"
           disabled={!input.trim()}
+          className="p-2 rounded-full bg-green-200 hover:bg-green-300 transition disabled:opacity-50"
         >
-          <IoSend
-            size={30}
-            className="text-green-500 px-2 cursor-pointer hover:text-green-700"
-          />
+          <IoSend size={25} className="text-green-600 hover:text-green-800" />
         </button>
       </div>
-       </div>
-       
-     
     </section>
   );
 };

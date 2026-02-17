@@ -84,7 +84,16 @@ makePayment: {
   getVaccantRooms:{
     url:"/api/LandLord/vacantRooms",
     method:"get"
-  }
+  },
+  updateTenantPassword:{
+    url:"/api/LandLord/updateTenantPassword",
+    method:"put"
+  },
+  manageUtilities: {
+  url: "/api/LandLord/manageUtilities",
+  method: "post"
+}
+
 };
 
 

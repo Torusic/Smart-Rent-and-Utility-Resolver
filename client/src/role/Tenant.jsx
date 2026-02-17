@@ -21,13 +21,13 @@ const Tenant = ({ onLogout,closeMenu }) => {
    
     { name: "Dashboard", path: "/tenantdashboard/tenantstatistics", icon: <MdDashboard size={20} /> },
     { name: "Chat", path: "/tenantdashboard/tenantChat", icon: <MdChat size={20} /> },
-    { name: "Update Profile", path: "/tenantdashboard/update", icon: <MdEdit size={20} /> },
+    { name: "Update password", path: "/tenantdashboard/updatePassword", icon: <MdEdit size={20} /> },
       {name:"History", icon:<FaHistory size={20} />},
     { name: "Logout", path: null, icon: <MdLogout size={20} /> },
   ];
 
   return (
-    <aside className="w-48  z-50 flex flex-col justify-between  lg:h-full h-190  inset-0 bg-gradient-to-t from-[#D1FAE5] via-transparent py-6  ">
+    <aside className="w-48  z-50 flex flex-col justify-between  lg:h-full h-190  bg-white via-transparent py-6  ">
       <ul className="space-y-2">
         {menu.map((item, i) => {
           // route-aware active: if path exists and current path starts with item.path

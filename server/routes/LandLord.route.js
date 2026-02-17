@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addTenantController, commonLoginController,getAllTenantsController, getMessagesController, getTenantMessages, getTenantUpdates, getUnreadMessagesForLandlord, getUnreadMessagesForTenant, landlordDashboardController, landlordDetails, markMessagesAsRead, markTenantMessagesAsRead, registerController, removeTenantController, searchTenant, sendChatToLandlord, sendChatToTenants, sendMessageToTenants, tenantDashboardController, updateLandlordController, vaccantRoomsController, verifyEmailController } from "../contollers/LandLord.Controller.js";
+import { addTenantController, commonLoginController,getAllTenantsController, getMessagesController, getTenantMessages, getTenantUpdates, getUnreadMessagesForLandlord, getUnreadMessagesForTenant, landlordDashboardController, landlordDetails, manageUtilities, markMessagesAsRead, markTenantMessagesAsRead, registerController, removeTenantController, searchTenant, sendChatToLandlord, sendChatToTenants, sendMessageToTenants, tenantDashboardController, tenantPasswordUpdate, updateLandlordController, vaccantRoomsController, verifyEmailController } from "../contollers/LandLord.Controller.js";
 import auth from "../middleware/auth.js";
 import { LogInstance } from "twilio/lib/rest/serverless/v1/service/environment/log.js";
 
@@ -13,6 +13,8 @@ LandLordRoute.post('/verify_email',verifyEmailController)
 LandLordRoute.post('/login',commonLoginController)
 LandLordRoute.post('/add',auth,addTenantController)
 LandLordRoute.get('/search',auth,searchTenant)
+LandLordRoute.put('/updateTenantPassword',auth,tenantPasswordUpdate)
+LandLordRoute.post('/manageUtilities',auth,manageUtilities)
 LandLordRoute.get('/vacantRooms',auth,vaccantRoomsController)
 LandLordRoute.get('/Ldashboard',auth,landlordDashboardController)
 LandLordRoute.get('/get',auth,getAllTenantsController)

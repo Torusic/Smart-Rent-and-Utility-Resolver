@@ -9,8 +9,8 @@ const ChatLayout = () => {
   const [selectedChat, setSelectedChat] = useState(null);
 
   return (
-    <section className="lg:shadow-md ml-0 mr-0 bg-green-100 my-auto container lg:w-full w-84 rounded border border-green-100 0 py-2 px-3 h-full">
-      <div className="flex h-full">
+    <section className="lg:shadow-md mt-2   overflow-y-auto scrollbar-hidden bg-green-50 h-160 my-auto container lg:w-full w-84 rounded-xl border-2 border-green-200 0 py-2 px-3 ">
+      <div className="flex items-center h-full gap-3 ">
         {/* LEFT: Chat List */}
         <div
           className={`w-full lg:w-1/3 ${
@@ -22,12 +22,12 @@ const ChatLayout = () => {
 
         {/* RIGHT: Chat Window */}
         <div
-          className={`w-full lg:w-2/3 ${
+          className={`w-full  ${
             selectedChat ? "block" : "hidden lg:flex items-center justify-center"
           }`}
         >
           {selectedChat ? (
-            <div className="h-full flex flex-col">
+            <div className=" flex flex-col">
               {/* Mobile Back Button */}
               <div className="lg:hidden flex items-center gap-2 p-2">
                 <button
@@ -40,7 +40,7 @@ const ChatLayout = () => {
               </div>
 
               {/* Chat Messages */}
-              <div className="flex-1 overflow-y-auto ">
+              <div className="flex-1  ">
                 <MessageChats chat={selectedChat} />
               </div>
             </div>

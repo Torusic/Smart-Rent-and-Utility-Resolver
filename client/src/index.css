@@ -28,3 +28,35 @@
     max-width: 600px;
   }
 }
+
+.card {
+  @apply shadow hover:shadow-xl transition transform duration-500 ease-in-out hover:scale-105 rounded-xl w-80 border border-gray-200 cursor-pointer;
+}
+
+.card-header {
+  @apply flex flex-col items-center justify-center mt-2 text-3xl font-bold gap-2;
+}
+
+.card-body {
+  @apply grid gap-3 px-8 mt-3 text-sm font-semibold text-gray-900;
+}
+
+.card-footer {
+  @apply flex justify-center items-center mt-4 mb-3;
+}
+
+.badge {
+  @apply py-0.5 px-4 mx-2 rounded-xl text-sm font-semibold;
+}
+
+.btn-green {
+  @apply bg-green-400 text-white py-3 px-3 rounded-full w-40 font-semibold cursor-pointer;
+}
+
+.btn-yellow {
+  @apply bg-yellow-400 text-white py-3 px-3 rounded-full w-40 font-semibold cursor-pointer;
+}
+
+.btn-blue {
+  @apply bg-blue-400 text-white py-3 px-3 rounded-full w-40 font-semibold cursor-pointer;
+}

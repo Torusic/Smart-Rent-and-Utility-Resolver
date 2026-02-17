@@ -10,7 +10,7 @@ const ChatBox = () => {
   return (
     <section className="lg:shadow-md ml-0 bg-white lg:w-full w-84 rounded border border-white lg:border-green-400  py-2 h-full">
       <div className="flex h-full">
-        {/* ✅ Chat List */}
+        {/*  Chat List */}
         <div
           className={`w-full lg:w-1/3 ${
             selectedChat ? "hidden lg:block" : "block"
@@ -19,7 +19,7 @@ const ChatBox = () => {
           <Chats onSelectChat={setSelectedChat} />
         </div>
 
-        {/* ✅ Messages */}
+        {/* Messages */}
         <div
           className={`w-full lg:w-2/3 ${
             selectedChat ? "block" : "hidden lg:flex items-center justify-center"

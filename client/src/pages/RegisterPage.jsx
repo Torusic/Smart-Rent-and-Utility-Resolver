@@ -71,21 +71,22 @@ const RegisterPage = () => {
   return (
     <section className='w-full bg-green-50 container h-screen '>
         <div className='top-20  sticky'>
-            <div className='bg-green-100 lg:w-130 w-80   p-7 mx-auto shadow-md  rounded  border border-green-400'>
+            <div className='bg-green-50 lg:w-130 w-80   p-7 mx-auto shadow-md  rounded  border-2 border-green-200'>
            
            <p className='bg-red-300 w-full   text-red-600 p-2 rounded font-semibold '>Only LandLords can Register</p>
             <p className='flex items-center font-extrabold mt-2 text-green-400'>Welcome to <img src={logo} alt="" width={60} height={60} className='' /></p>
-           <p className='text-black py-3 font-bold'>LandLord Registration</p>
+           <p className='text-green-400 text-2xl py-3 font-bold'>LandLord Registration</p>
            <form action="" onSubmit={handleSubmit}>
             <div className='grid py-2 ml-3'>
-            <label htmlFor="" className='text-black font-semibold'>Name:</label>
+            <label htmlFor="" className='text-black text-sm font-semibold'>Name:</label>
             <input type="text"
              name="name"
             id='name'
             onChange={handleChange} 
             value={data.name}
-            
-            className='border border-white outline-none border-b-black rounded'
+            placeholder='Enter name....'
+        
+            className='border border-gray-200 mt-2 bg-green-50 py-2 rounded-lg outline-none px-2'
             />
 
            </div>

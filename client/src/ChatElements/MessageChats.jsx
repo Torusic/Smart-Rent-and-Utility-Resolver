@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { IoArrowBack, IoSend } from 'react-icons/io5';
+import { IoSend } from 'react-icons/io5';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
@@ -8,27 +8,26 @@ import toast from 'react-hot-toast';
 const MessageChats = ({ chat }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const messagesEndRef = useRef(null); // ✅ Ref for auto-scroll
+  const scrollRef = useRef(null);
 
-  // Scroll to bottom when messages update
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // Auto-scroll to bottom when messages update
   useEffect(() => {
-    scrollToBottom();
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
   }, [messages]);
 
-  // Fetch messages if chat exists
+  // Fetch messages
   useEffect(() => {
     if (!chat?._id) return;
 
     const fetchMessages = async () => {
       try {
         const response = await Axios(SummaryApi.getChat(chat._id));
-        if (response.data.success) {
-          setMessages(response.data.data);
-        }
+        if (response.data.success) setMessages(response.data.data);
       } catch (error) {
         AxiosToastError(error);
       }
@@ -39,6 +38,25 @@ const MessageChats = ({ chat }) => {
     return () => clearInterval(interval);
   }, [chat]);
 
+  // Mark messages as read
+  useEffect(() => {
+    if (!chat?._id) return;
+
+    const markAsRead = async () => {
+      try {
+        await Axios({
+          url: SummaryApi.markTenantMessagesAsRead.url,
+          method: SummaryApi.markTenantMessagesAsRead.method,
+          data: { tenantId: chat._id },
+        });
+      } catch (error) {
+        console.error('Error marking messages as read', error);
+      }
+    };
+
+    markAsRead();
+  }, [chat]);
+
   // Send message
   const handleSend = async () => {
     if (!chat || !chat._id || !input.trim()) return;
@@ -46,7 +64,7 @@ const MessageChats = ({ chat }) => {
     try {
       let url, method, payload;
 
-      if (chat.role === "tenant") {
+      if (chat.role === 'tenant') {
         // Landlord sending to tenant
         ({ url, method } = SummaryApi.sendChat(chat._id));
         payload = { tenantId: chat._id, content: input.trim() };
@@ -79,62 +97,64 @@ const MessageChats = ({ chat }) => {
   }
 
   return (
-    <section className="w-full flex rounded bg-green-100 flex-col">
-      <header className="shadow-md bg-green-200 border border-green-200 px-2  py-4 h-10 flex items-center font-semibold">
-         
-        Chat with {chat.name}{' '}
-        <h2 className="italic text-sm text-red-400 px-2 gap-2 font-light">
-          ({chat.role})
-        </h2>
+    <section className="w-full flex flex-col h-155 rounded-2xl   overflow-hidden bg-gradient-to-t from-green-100 to-green-50">
+      
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-green-200 border-b border-green-300 px-4 py-3 flex items-center justify-between font-semibold shadow-sm">
+        <div>
+          Chat with <span className="italic text-red-500">{chat.name}</span>
+          <span className="text-sm text-gray-600 ml-2">({chat.role})</span>
+          <p className="text-gray-400 text-xs font-normal italic ">room {chat.room}</p> 
+          
+        </div>
       </header>
 
-      <div className="lg:h-130 h-120 overflow-y-auto scrollbar-hidden p-3 bg-green-100  ">
-        {messages.length ? (
-  messages.map(msg =>
-    msg?._id ? (
+      {/* Messages */}
       <div
-        key={msg._id}
-        className={`mb-2 p-3 max-w-xs break-words ${
-          msg.senderModel === "Tenant"
-            ? "bg-white  text-green-900  text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-br-3xl lg:mr-auto ml-2 mr-20 shadow"
-            : "bg-green-500 text-white text-sm font-medium rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl lg:ml-auto mr-2 ml-20 shadow"
-        }`}
+        ref={scrollRef}
+        className="flex-1 space-y-6 overflow-y-auto scrollbar-hidden  overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100"
       >
-        <p className="text-xs text-green-500 italic mb-1">{chat.name}</p>
-        <p>{msg.content}</p>
+        {messages.length ? (
+          messages.map(msg =>
+            msg?._id ? (
+              <div
+                key={msg._id}
+                className={`p-3 max-w-xs break-words text-sm font-medium shadow ${
+                  msg.senderModel === 'Tenant'
+                    ? 'bg-white text-green-900 py-5 rounded-tl-3xl rounded-tr-3xl rounded-br-3xl mr-auto'
+                    : 'bg-green-500 text-white rounded-tl-3xl rounded-tr-3xl rounded-bl-3xl ml-auto'
+                }`}
+              >
+                {msg.senderModel !== 'Tenant' && (
+                  <p className="text-xs text-green-200 italic mb-1">{chat.name}</p>
+                )}
+                <p>{msg.content}</p>
+              </div>
+            ) : null
+          )
+        ) : (
+          <p className="text-gray-400 text-sm italic">No messages yet...</p>
+        )}
       </div>
-    ) : null
-  )
-) : (
-  <p className="text-gray-400 text-sm italic">No messages yet...</p>
-)}
 
-        <div ref={messagesEndRef} /> {/* ✅ Scroll target */}
-      </div>
-      <div className='p-2 bg-green-200 rounded '>
-        <div className="mt-auto border border-blue-100 flex items-center rounded p-2 bg-blue-100">
+      {/* Input */}
+      <div className="bg-green-200 p-3  border-t border-green-50 flex items-center gap-2">
         <input
           type="text"
-          className="w-full outline-none bg-transparent"
-          placeholder="Type something..."
           value={input}
           onChange={e => setInput(e.target.value)}
+          placeholder="Type a message..."
           onKeyDown={e => e.key === 'Enter' && handleSend()}
+          className="flex-1 p-3 rounded-xl border border-gray-400 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500"
         />
         <button
           onClick={handleSend}
-          className="ml-2"
           disabled={!input.trim()}
+          className="p-2 rounded-full bg-green-300 hover:bg-green-400 transition disabled:opacity-50"
         >
-          <IoSend
-            size={25}
-            className="text-green-500 cursor-pointer hover:text-green-700"
-          />
+          <IoSend size={25} className="text-green-700 hover:text-green-900" />
         </button>
       </div>
-      </div>
-
-      
     </section>
   );
 };

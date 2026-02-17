@@ -63,7 +63,7 @@ function RentPayment({ close, refreshDashboard, balance }) {
 
   return (
     <div className='bg-neutral-950/70 z-50 top-0 left-0 right-0 bottom-0 fixed flex items-center justify-center'>
-      <div className='bg-green-100 p-3 w-full max-w-md grid rounded items-center'>
+      <div className='bg-white p-3 w-full max-w-md grid rounded-lg items-center'>
         <div className='flex justify-between items-center p-3'>
           <p className='text-sm font-semibold'>Make Rent Payment</p>
           <IoClose onClick={close} className='cursor-pointer'/>
@@ -76,7 +76,7 @@ function RentPayment({ close, refreshDashboard, balance }) {
               <input
                 type="number"
                 placeholder='Enter Amount...'
-                className='w-full p-1 text-black text-semibold outline-none bg-white rounded'
+                className='w-full p-1 text-black text-semibold outline-none py-3 border px-2 bg-gray-100 border-gray-300  rounded-lg'
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
               />

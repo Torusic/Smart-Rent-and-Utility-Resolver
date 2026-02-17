@@ -10,13 +10,13 @@ const LandLordDashboard = () => {
   const[dark,setDark]=useState(false)
 
   return (
-    <section className="h-screen flex flex-col inset-0 bg-gradient-to-t from-[#D1FAE5] via-transparent overflow-x-hidden">
+    <section className="h-screen flex flex-col bg-white via-transparent overflow-x-hidden">
       {/* Sticky header */}
-      <header className="h-20 bg-green-50 z-50 shadow-md sticky top-0 flex items-center justify-between px-4">
+      <header className="h-20 bg-white z-50 shadow-md sticky top-0 flex items-center justify-between px-4">
         {/* Logo */}
         <img src={logo} alt="SmartRent" width={100} height={100} className="ml-2" />
 
-        {/* Menu Icon (only on small screens) */}
+        {/* Menu Icon */}
         
         <button
           className="lg:hidden cursor-pointer"
@@ -47,7 +47,7 @@ const LandLordDashboard = () => {
         </div>
 
         {/* Main scrollable content */}
-        <main className="flex-1 overflow-y-auto h-full bg-green-50 p-2  ">
+        <main className="flex-1 overflow-y-auto h-full bg-white  ">
           <Outlet />
         </main>
       </div>

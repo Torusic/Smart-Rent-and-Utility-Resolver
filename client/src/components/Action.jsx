@@ -6,7 +6,7 @@ import { BsFillExclamationTriangleFill } from "react-icons/bs"
 const Action = ({close,cancel,confirm}) => {
   return (
     <section className=' bg-neutral-950/70 z-50 fixed top-0 left-0 bottom-0 right-0 p-4 flex  items-center justify-center'>
-        <div className='bg-green-100 w-full max-w-md rounded p-4'>
+        <div className='bg-white w-full max-w-md rounded-lg p-6'>
             <div className='flex justify-between items-center'>
                 <h1 className='text-red-400 font-bold flex gap-2'><HiOutlineExclamationCircle size={26}/> Tenant removal</h1>
                 <button>
