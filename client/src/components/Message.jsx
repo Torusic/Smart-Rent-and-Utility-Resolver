@@ -32,8 +32,8 @@ const Message = () => {
   };
 
   return (
-    <section className='mt-4'>
-      <div className='max-w-7xl mx-auto bg-white  rounded-2xl p-6 lg:p-8 w-full transition '>
+    <section className='mt-1'>
+      <div className='max-w-7xl mx-auto bg-white  rounded-2xl p-6 lg:p-4 w-full transition '>
         
         {/* Header */}
         <span className='font-bold text-xl p-2 rounded text-green-600 text-center w-full block mb-4'>

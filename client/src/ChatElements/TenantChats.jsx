@@ -100,8 +100,8 @@ const TenantChats = () => {
                 key={msg._id}
                 className={`p-3 max-w-xs break-words text-sm font-medium ${
                   msg.senderModel === "Tenant"
-                    ? "bg-green-500 text-white rounded-tr-3xl rounded-tl-3xl rounded-br-3xl ml-auto shadow"
-                    : "bg-white text-green-900 rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl mr-auto shadow"
+                    ? "bg-green-500  py-5 text-white rounded-tr-3xl rounded-tl-3xl rounded-br-3xl ml-auto shadow"
+                    : "bg-white  text-green-900 rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl mr-auto shadow"
                 }`}
               >
                 {msg.senderModel !== "Tenant" && (

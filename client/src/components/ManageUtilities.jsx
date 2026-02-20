@@ -35,9 +35,7 @@ const ManageUtilities = ({ tenant, close, fetch }) => {
 
       toast.success(response?.data?.message);
 
-      if (fetch) {
-        
-      }
+      if (fetch) fetch()
     } catch (error) {
       AxiosToastError(error);
     }

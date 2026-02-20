@@ -97,7 +97,7 @@ const MessageChats = ({ chat }) => {
   }
 
   return (
-    <section className="w-full flex flex-col h-155 rounded-2xl   overflow-hidden bg-gradient-to-t from-green-100 to-green-50">
+    <section className="w-full flex flex-col h-155 rounded-2xl mr-0 ml-0   overflow-hidden bg-gradient-to-t from-green-100 to-green-50">
       
       {/* Header */}
       <header className="sticky top-0 z-10 bg-green-200 border-b border-green-300 px-4 py-3 flex items-center justify-between font-semibold shadow-sm">
@@ -112,7 +112,7 @@ const MessageChats = ({ chat }) => {
       {/* Messages */}
       <div
         ref={scrollRef}
-        className="flex-1 space-y-6 overflow-y-auto scrollbar-hidden  overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100"
+        className="flex-1 space-y-2 overflow-y-auto  scrollbar-hidden  overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100"
       >
         {messages.length ? (
           messages.map(msg =>

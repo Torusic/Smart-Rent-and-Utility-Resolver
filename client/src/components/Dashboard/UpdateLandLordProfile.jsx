@@ -148,7 +148,7 @@ const UpdateLandLordProfile = ({ dark }) => {
       <Divider />
 
       {/* Messages Section */}
-      <div className="mt-8">
+      <div className="mt-1">
         <Message />
       </div>
     </section>

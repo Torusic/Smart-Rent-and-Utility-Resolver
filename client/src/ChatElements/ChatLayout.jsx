@@ -9,7 +9,7 @@ const ChatLayout = () => {
   const [selectedChat, setSelectedChat] = useState(null);
 
   return (
-    <section className="lg:shadow-md mt-2   overflow-y-auto scrollbar-hidden bg-green-50 h-160 my-auto container lg:w-full w-84 rounded-xl border-2 border-green-200 0 py-2 px-3 ">
+    <section className="lg:shadow-md mt-2   overflow-y-auto scrollbar-hidden  h-160 my-auto container lg:w-full w-84 rounded-xl  0 py-2 px-3 ">
       <div className="flex items-center h-full gap-3 ">
         {/* LEFT: Chat List */}
         <div

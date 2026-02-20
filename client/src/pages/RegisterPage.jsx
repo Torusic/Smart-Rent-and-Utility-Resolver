@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import {FaEye, FaEyeSlash} from 'react-icons/fa'
+import { FaEye, FaEyeSlash } from 'react-icons/fa'
 import Axios from '../utils/Axios'
 import SummaryApi from '../common/SummaryApi'
 import toast from 'react-hot-toast'
@@ -8,193 +8,142 @@ import AxiosToastError from '../utils/AxiosToastError'
 import logo from '../assets/smartrent.png'
 
 const RegisterPage = () => {
+    const [data, setData] = useState({
+        name: "",
+        email: "",
+        phone: "",
+        password: "",
+        confirmPassword: "",
+        totalRooms: ""
+    })
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const navigate = useNavigate()
 
-    const[data,setData]=useState({
-        name:"",
-        email:"",
-        phone:"",
-        password:"",
-        confirmPassword:"",
-        totalRooms:""
-})
-    const[showPassword,setShowPassword]=useState(false)
-    const[showConfirmPassword,setShowConfirmPassword]=useState(false)
-    const navigate=useNavigate()
-
-    const handleChange=(e)=>{
-        const{name,value}=e.target
-
-        setData((preve)=>{
-            return{
-                ...preve,
-                [name]:value
-            }
-        })
-
+    const handleChange = (e) => {
+        const { name, value } = e.target
+        setData(prev => ({ ...prev, [name]: value }))
     }
-    const handleSubmit=async(e)=>{
-        e.preventDefault()
-      
-            if(data.password!==data.confirmPassword){
-                toast.error("Password does not match")
-                return
-            }
 
-              try {
-                const response= await Axios({
-                    ...SummaryApi.register,
-                    data:data
-                })
-            if(response.data.error){
-                toast.error(response.data.error)
-            }
-            if(response.data.success){
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        if (data.password !== data.confirmPassword) {
+            toast.error("Passwords do not match")
+            return
+        }
+        try {
+            const response = await Axios({ ...SummaryApi.register, data: data })
+            if (response.data.error) toast.error(response.data.error)
+            if (response.data.success) {
                 toast.success(response.data.message)
-                setData({
-                    name:"",
-                    email:"",
-                    phone:"",
-                    password:"",
-                    confirmPassword:"",
-                    totalRooms:""
-                })
+                setData({ name: "", email: "", phone: "", password: "", confirmPassword: "", totalRooms: "" })
                 navigate('/login')
             }
         } catch (error) {
             AxiosToastError(error)
-            
         }
     }
 
-
-   const validate=Object.values(data).every(el=>el)
-  return (
-    <section className='w-full bg-green-50 container h-screen '>
-        <div className='top-20  sticky'>
-            <div className='bg-green-50 lg:w-130 w-80   p-7 mx-auto shadow-md  rounded  border-2 border-green-200'>
-           
-           <p className='bg-red-300 w-full   text-red-600 p-2 rounded font-semibold '>Only LandLords can Register</p>
-            <p className='flex items-center font-extrabold mt-2 text-green-400'>Welcome to <img src={logo} alt="" width={60} height={60} className='' /></p>
-           <p className='text-green-400 text-2xl py-3 font-bold'>LandLord Registration</p>
-           <form action="" onSubmit={handleSubmit}>
-            <div className='grid py-2 ml-3'>
-            <label htmlFor="" className='text-black text-sm font-semibold'>Name:</label>
-            <input type="text"
-             name="name"
-            id='name'
-            onChange={handleChange} 
-            value={data.name}
-            placeholder='Enter name....'
-        
-            className='border border-gray-200 mt-2 bg-green-50 py-2 rounded-lg outline-none px-2'
-            />
-
-           </div>
-            <div className='grid py-2 ml-3'>
-            <label htmlFor="" className='text-black font-semibold'>Email:</label>
-            <input type="email" 
-            id='email'
-             name="email"
-             onChange={handleChange} 
-             value={data.email}
-            
-            className='border border-white outline-none border-b-black'
-            />
-
-           </div>
-            <div className='grid py-2 ml-3'>
-            <label htmlFor="" className='text-black font-semibold'>Phone:</label>
-            <input type="tel" 
-            id='phone'
-             name="phone"
-
-             onChange={handleChange} 
-             value={data.phone}
-            
-            className='border border-white outline-none border-b-black'
-            />
-
-           </div>
-            <div className='grid py-2 ml-3'>
-            <label htmlFor="" className='text-black font-semibold'>Password:</label>
-            <div className=' bg-white border-white border-b-black outline-none border rounded flex items-center justify-between gap-2 '>
-            <input type={showPassword? "text":"password"}
-            id='password'
-             name="password"
-             onChange={handleChange}  
-             value={data.password}
-            
-            
-            className=' w-full outline-none'
-            />
-           
-            <div onClick={()=>setShowPassword(preve=>!preve)}>
-                {
-                    showPassword ?(
-                        <FaEye/>
-                    ):(
-                        <FaEyeSlash/>
-                    )
-                }
-                
+    return (
+        <section className="w-full h-screen flex items-center justify-center p-3 bg-gradient-to-br from-green-50 to-white overflow-hidden">
+            <div className="bg-white w-auto lg:max-w-2xl p-8 rounded-3xl shadow-xl flex flex-col justify-center h-full">
+                <div className="flex flex-col items-center mb-6">
+                    <img src={logo} alt="SmartRent Logo" className="w-20 h-20 mb-2" />
+                    <h1 className="text-2xl font-bold text-green-600">Landlord Registration</h1>
+                    <p className="text-sm text-gray-500 mt-1">Only landlords can register</p>
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-hidden">
+                    <div className="mt-2 mb-2 mr-1 ml-1">
+                        <label className="block text-gray-700 font-medium mb-1">Name</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={data.name}
+                            onChange={handleChange}
+                            placeholder="Enter your name"
+                            className="w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-300"
+                        />
+                    </div>
+                    <div className="mt-2 mb-2 mr-1 ml-1">
+                        <label className="block text-gray-700 font-medium mb-1">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={data.email}
+                            onChange={handleChange}
+                            placeholder="Enter your email"
+                            className="w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-300"
+                        />
+                    </div>
+                    <div className="mt-2 mb-2 mr-1 ml-1">
+                        <label className="block text-gray-700 font-medium mb-1">Phone</label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={data.phone}
+                            onChange={handleChange}
+                            placeholder="Enter your phone number"
+                            className="w-full px-4 py-2 border rounded-lg border-gray-300  focus:outline-none focus:ring-2 focus:ring-green-300"
+                        />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4 mt-2 mb-2 mr-1 ml-1">
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Password</label>
+                            <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-green-300">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={data.password}
+                                    onChange={handleChange}
+                                    placeholder="Enter password"
+                                    className="w-full outline-none"
+                                />
+                                <span onClick={() => setShowPassword(prev => !prev)} className="cursor-pointer text-gray-500">
+                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex-1">
+                            <label className="block text-gray-700 font-medium mb-1">Confirm Password</label>
+                            <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 focus-within:ring-2 focus-within:ring-green-300">
+                                <input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    name="confirmPassword"
+                                    value={data.confirmPassword}
+                                    onChange={handleChange}
+                                    placeholder="Confirm password"
+                                    className="w-full outline-none"
+                                />
+                                <span onClick={() => setShowConfirmPassword(prev => !prev)} className="cursor-pointer text-gray-500">
+                                    {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="mt-2 mb-2 mr-1 ml-1">
+                        <label className="block text-gray-700 font-medium mb-1">Total Rooms</label>
+                        <input
+                            type="text"
+                            name="totalRooms"
+                            value={data.totalRooms}
+                            onChange={handleChange}
+                            placeholder="Enter total rooms"
+                            className="w-full px-4 py-2 border rounded-lg border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-300"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-all mt-2 mb-2"
+                    >
+                        Register
+                    </button>
+                </form>
+                <p className="text-center text-gray-500 mt-4">
+                    Already have an account? <Link to="/login" className="text-green-500 font-semibold hover:underline">Login</Link>
+                </p>
             </div>
-             </div>
-           </div>
-         <div className='grid py-2 ml-3'>
-            <label htmlFor="" className='text-black font-semibold'>Confirm Password:</label>
-            <div className=' bg-white border-white border-b-black outline-none border rounded flex items-center justify-between gap-2 '>
-            <input type={showConfirmPassword? "text":"password" }
-             onChange={handleChange}
-             id='confirmPassword'
-              name="confirmPassword"
-             value={data.confirmPassword} 
-            
-            
-            className=' w-full outline-none'
-            />
-            <div onClick={()=>setShowConfirmPassword(preve=>!preve)}>
-                {
-                    showConfirmPassword ?(
-                        <FaEye/>
-                    ):(
-                        <FaEyeSlash/>
-                    )
-                }
-                
-            </div>
-           
-            
-             </div>
-           </div>
-            <div className='grid py-4 ml-3'>
-            <label htmlFor="" className='text-black font-semibold'>Total Rooms:</label>
-            <input type="text" 
-            id='totalRooms'
-            name="totalRooms"
-             onChange={handleChange}
-             value={data.totalRooms} 
-            
-            className='border border-white outline-none border-b-black'
-            />
-
-           </div>
-
-           <button className='bg-green-400  text-white font-bold w-full p-3 rounded'>Register</button>
-           </form>
-           <p className='flex gap-2 py-3 items-center justify-center'>Already have an Account ?<Link to={"/login"} className='font-semibold'>Login</Link></p>
-           
-          
-          
-
-          
-        </div>
-        </div>
-        
-
-    </section>
-      
-    
-  )
+        </section>
+    )
 }
 
 export default RegisterPage

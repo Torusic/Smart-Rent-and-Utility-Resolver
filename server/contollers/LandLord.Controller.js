@@ -208,7 +208,7 @@ export async function addTenantController(req, res) {
     const LandLordId = req.userId;
     const { name, email, phone, room, rent } = req.body;
 
-    //  Validate required fields
+  
     if (!name || !email || !phone || !room || !rent) {
       return res.status(400).json({
         message: "All fields are required",
@@ -217,7 +217,7 @@ export async function addTenantController(req, res) {
       });
     }
 
-    //  Fetch landlord
+
     const landlord = await LandLord.findById(LandLordId);
     if (!landlord) {
       return res.status(404).json({
@@ -227,7 +227,7 @@ export async function addTenantController(req, res) {
       });
     }
 
-    //  Check if all rooms are full
+    
     if (landlord.rentedRooms >= landlord.totalRooms) {
       return res.status(400).json({
         message: "All rooms fully occupied",
@@ -236,7 +236,7 @@ export async function addTenantController(req, res) {
       });
     }
 
-    //  Check if room is already occupied
+    
     const tenantExist = await TenantModel.findOne({ landlord: LandLordId, room });
     if (tenantExist) {
       return res.status(400).json({
@@ -246,11 +246,11 @@ export async function addTenantController(req, res) {
       });
     }
 
-    //  Generate password for tenant
+    
     const plainPassword = generatePassword();
     const hashpassword = await bcryptjs.hash(plainPassword, 10);
 
-    //  Create tenant
+    
     const newTenant = new TenantModel({
       landlord: LandLordId,
       name,
@@ -260,32 +260,34 @@ export async function addTenantController(req, res) {
       rent,
       role: "tenant",
       password: hashpassword,
-      deviceId:`Room ${room}`
+      deviceId: `Room ${room}`,
     });
 
     const savedTenant = await newTenant.save();
 
-    //  Update landlord counts
+  
     landlord.Tenant.push(savedTenant._id);
     landlord.rentedRooms += 1;
     landlord.vacantRooms = landlord.totalRooms - landlord.rentedRooms;
     await landlord.save();
 
-    // Send email
-    let formattedNumber = phone.startsWith("0")
-      ? "+254" + phone.slice(1)
-      : phone;
+    
+    const recipients = Array.isArray(email) ? email : [email];
+ 
 
-    await sendEmail({
-      sendTo: email,
-      subject: 'Verify your email',
-      html: verifyEmailTemplate({
-        name,
-        phone,
-        plainPassword
-      })
-    });
+    if (recipients.length > 0) {
+      await sendEmail({
+        sendTo: recipients,
+        subject: "Verify your Smart Rent account",
+        html: verifyEmailTemplate({
+          name,
+          phone,
+          plainPassword,
+        }),
+      });
+    }
 
+   
     return res.status(200).json({
       message: "Tenant added successfully",
       error: false,
@@ -298,7 +300,7 @@ export async function addTenantController(req, res) {
         room: savedTenant.room,
         rent: savedTenant.rent,
         role: savedTenant.role,
-        password: plainPassword,
+        password: plainPassword, 
       },
     });
 
