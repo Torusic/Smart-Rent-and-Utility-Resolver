@@ -85,8 +85,16 @@ io.on("connection", (socket) => {
     if (!tenant) return;
 
     // Auto cut-off based on payment
-    const electricityStatus = tenant.payment.balance > 0 ? "OFF" : "ON";
-    const waterStatus = tenant.payment.balance > 0 ? "OFF" : "ON";
+    //const electricityStatus = tenant.payment.balance > 0 ? "OFF" : "ON";
+   // const waterStatus = tenant.payment.balance > 0 ? "OFF" : "ON";
+
+  let electricityStatus = tenant.utilities.electricityStatus;
+    let waterStatus = tenant.utilities.waterStatus;
+
+    if (tenant.payment.balance > 0) {
+    electricityStatus = "OFF";
+    waterStatus = "OFF";
+    }
 
     // Update tenant document
     tenant.relay.electricity = electricityStatus === "ON";

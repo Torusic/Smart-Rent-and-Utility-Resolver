@@ -8,67 +8,98 @@ import AxiosToastError from "../utils/AxiosToastError";
 const TenantChats = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [category, setCategory] = useState("");
   const [landlord, setLandlord] = useState(null);
 
   const scrollRef = useRef(null);
 
-  // Auto-scroll to bottom when messages update
+  // Auto scroll
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
-      });
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // Fetch landlord info
+  // Fetch tenant dashboard (get landlord info)
   useEffect(() => {
     const fetchTenantDashboard = async () => {
       try {
         const { url, method } = SummaryApi.tenantDashboard;
+
         const { data } = await Axios({ url, method });
+
         if (data.success && data.data.landlord) {
           setLandlord(data.data.landlord);
         }
       } catch (error) {
-        console.error("Error fetching tenant dashboard:", error);
+        console.error(error);
       }
     };
+
     fetchTenantDashboard();
   }, []);
 
-  // Fetch chat history every 3 seconds
+  // Fetch chat messages (category mandatory)
   useEffect(() => {
     if (!landlord?.id) return;
+
     const fetchMessages = async () => {
       try {
-        const { url, method } = SummaryApi.getTenantChats(landlord.id);
+        const { url, method } = SummaryApi.getTenantChats(
+          landlord.id,
+          category || "All"
+        );
+
         const { data } = await Axios({ url, method });
-        if (data.success) setMessages(data.data);
+
+        if (data.success && Array.isArray(data.data)) {
+          setMessages(data.data.filter(m => m && m._id));
+        } else {
+          setMessages([]);
+        }
       } catch (error) {
-        console.error("Error fetching messages:", error);
+        console.error(error);
       }
     };
+
     fetchMessages();
+
     const interval = setInterval(fetchMessages, 3000);
     return () => clearInterval(interval);
-  }, [landlord]);
 
+  }, [landlord, category]);
+
+  // Send message
   const handleSend = async () => {
-    if (!landlord?.id || !input.trim()) return;
-    try {
-      const { url, method } = SummaryApi.sendChatToLandlord(landlord.id);
-      const payload = { landlordId: landlord.id, content: input.trim() };
-      const response = await Axios({ url, method, data: payload });
 
-      if (response.data.success) {
-        setMessages((prev) => [...prev, response.data.data]);
+    if (!category) {
+      toast.error("Please select category first");
+      return;
+    }
+
+    if (!input.trim() || !landlord?.id) return;
+
+    try {
+      const api = SummaryApi.sendChatToLandlord;
+
+      const response = await Axios({
+        url: api.url,
+        method: api.method,
+        data: {
+          landlordId: landlord.id,
+          content: input.trim(),
+          category
+        }
+      });
+
+      if (response?.data?.success) {
+        setMessages(prev => [...prev, response.data.data]);
         setInput("");
         toast.success(response.data.message);
       } else {
-        toast.error(response.data.message || "Failed to send message");
+        toast.error(response?.data?.message || "Failed to send");
       }
+
     } catch (error) {
       AxiosToastError(error);
     }
@@ -76,63 +107,95 @@ const TenantChats = () => {
 
   if (!landlord) {
     return (
-      <div className="p-4 text-gray-500 italic">Loading chat with your landlord...</div>
+      <div className="p-4 text-gray-500 italic">
+        Loading chat with your landlord...
+      </div>
     );
   }
 
   return (
-    <section className="max-w-9xl mx-auto mt-4 flex flex-col mb-6 h-[600px] rounded-2xl shadow-lg border border-green-200 overflow-hidden bg-gradient-to-t from-[#D1FAE5]">
-      
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-green-100 border-b border-green-300 px-4 py-3 flex items-center font-semibold shadow-sm">
-        Chat with <span className="italic text-red-500 ml-2">{landlord.name} (Landlord)</span>
+    <section className="max-w-9xl mx-auto mt-2 ml-2 border-r-4 border-gray-400 mr-1 flex flex-col mb-6 h-[640px] rounded-2xl shadow-lg  overflow-hidden bg-gradient-to-t from-[#D1FAE5]">
+
+      {/* HEADER */}
+      <header className="sticky top-0  bg-white  px-4 py-3 font-semibold shadow-sm">
+        Chat with
+        <span className="italic text-red-500 ml-2">
+          {landlord.name} (Landlord)
+        </span>
       </header>
 
-      {/* Messages Area */}
+      {/* CATEGORY SELECT */}
+      <div className="bg-white p-3">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full p-3 rounded-xl  bg-gray-100  outline-none"
+        >
+          <option value=""> Select Category (Required)</option>
+          <option value="General">General</option>
+          <option value="Rent">Rent</option>
+          <option value="Electricity">Electricity</option>
+          <option value="Water">Water</option>
+          <option value="Maintenance">Maintenance</option>
+          <option value="Announcement">Announcement</option>
+        </select>
+      </div>
+
+      {/* MESSAGES */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto p-4 space-y-3 bg-green-50 scrollbar-thin scrollbar-thumb-green-300 scrollbar-track-green-100"
+        className="flex-1 overflow-y-auto h-full p-4 space-y-3 bg-green-50 scrollbar-hidden scrollbar-thumb-green-300 scrollbar-track-green-100"
       >
         {messages.length ? (
-          messages.map((msg) =>
-            msg?._id ? (
+          messages.map(msg => {
+
+            if (!msg?._id) return null;
+
+            return (
               <div
                 key={msg._id}
-                className={`p-3 max-w-xs break-words text-sm font-medium ${
+                className={`p-3 max-w-xs break-words text-sm shadow ${
                   msg.senderModel === "Tenant"
-                    ? "bg-green-500  py-5 text-white rounded-tr-3xl rounded-tl-3xl rounded-br-3xl ml-auto shadow"
-                    : "bg-white  text-green-900 rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl mr-auto shadow"
+                    ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white ml-auto rounded-tr-3xl rounded-2xl border-l-4 border-green-600 h-20  rounded-tl-3xl rounded-br-3xl"
+                    : "bg-gradient-to-r from-gray-50 to-white  rounded-2xl border-l-4 border-gray-400 h-20 text-green-900 mr-auto rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl"
                 }`}
               >
-                {msg.senderModel !== "Tenant" && (
-                  <p className="text-xs italic text-green-500 mb-1">{landlord.name}</p>
-                )}
-                <p>{msg.content}</p>
+                <span className="text-[10px] px-2 py-1 bg-black/10 rounded-full">
+                  {msg.category || "General"}
+                </span>
+
+                <p className="mt-1">{msg.content}</p>
               </div>
-            ) : null
-          )
+            );
+          })
         ) : (
-          <p className="text-gray-400 italic text-sm">No messages yet...</p>
+          <p className="text-gray-400 italic text-sm">
+            No messages yet...
+          </p>
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="bg-green-100 p-3 flex items-center gap-2 border-t border-green-200">
+      {/* INPUT AREA */}
+      <div className="bg-white p-3 flex gap-2 ">
+
         <input
           type="text"
           value={input}
+          disabled={!category}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message..."
+          placeholder={category ? "Type message..." : "Select category first"}
           onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="flex-1 p-3 rounded-xl border border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500"
+          className="flex-1 p-3 rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-green-300 disabled:opacity-50"
         />
+
         <button
           onClick={handleSend}
-          disabled={!input.trim()}
+          disabled={!input.trim() || !category}
           className="p-2 rounded-full bg-green-200 hover:bg-green-300 transition disabled:opacity-50"
         >
-          <IoSend size={25} className="text-green-600 hover:text-green-800" />
+          <IoSend size={25} className="text-green-600" />
         </button>
+
       </div>
     </section>
   );

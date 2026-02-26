@@ -15,11 +15,12 @@ const tenantSchema = new mongoose.Schema({
      required: true,
       unique: true
      },
-  phone: { 
-    type: String, 
-    required: true,
-     length: 10
-     },
+  phone: {
+      type: String,
+      required: true,
+      unique: true,
+      length: 10,
+    },
   password: {
      type: String,
       required: true
@@ -62,70 +63,111 @@ relay: {
 },
 
  // Payment Tracking
-  payment: {
-    totalRent: { 
-      type: Number,
-       default: 0 
-      },
-    amountPaid: {
-       type: Number,
-        default: 0 
-      },
-    balance: {
-       type: Number, 
-       default: 0 
-      },
-    lastPaidAmount: { 
-      type: Number, 
-      default: 0 
-    },
-    lastPaidAt: {
-       type: Date 
-      }
+ // Payment Tracking
+payment: {
+  totalRent: {
+    type: Number,
+    default: 0
   },
 
-  // Utilities
-  utilities: {
-    waterStatus: {
-       type: String,
-        enum: ["ON", "OFF"],
-         default: "ON"
-         },
-    water: {
-      units: {
-         type: Number,
-          default: 0 
-        },
-      amount: { 
-        type: Number,
-         default: 0 
-        },
-      token: { 
-        type: String, 
-        default: "" 
-      },
-    },
+  amountPaid: {
+    type: Number,
+    default: 0
+  },
 
-    electricityStatus: { 
-      type: String, 
-      enum: ["ON", "OFF"],
-       default: "ON" 
-      },
-    electricity: {
-      units: { 
-        type: Number,
-         default: 0
-         },
-      amount: {
-         type: Number,
-          default: 0
-         },
-      token: { 
+  balance: {
+    type: Number,
+    default: 0
+  },
+
+  lastPaidAmount: {
+    type: Number,
+    default: 0
+  },
+
+  lastPaidAt: {
+    type: Date
+  },
+
+  history: [
+    {
+      description: String,
+
+      amount: Number,
+
+      status: {
         type: String,
-         default: "" 
-        },
-    },
+        enum: ["SUCCESS", "FAILED", "PENDING"],
+        default: "PENDING"
+      },
+
+      date: {
+        type: Date,
+        default: Date.now
+      },
+
+      transactionId: String
+    }
+  ]
+},
+
+// Utilities
+utilities: {
+  waterStatus: {
+    type: String,
+    enum: ["ON", "OFF"],
+    default: "OFF"
   },
+
+  water: {
+    units: {
+      type: Number,
+      default: 0
+    },
+
+    amount: {
+      type: Number,
+      default: 0
+    },
+
+    token: {
+      type: String,
+      default: ""
+    }
+  },
+
+  electricityStatus: {
+    type: String,
+    enum: ["ON", "OFF"],
+    default: "OFF"
+  },
+
+  electricity: {
+    units: {
+      type: Number,
+      default: 0
+    },
+
+    amount: {
+      type: Number,
+      default: 0
+    },
+
+    token: {
+      type: String,
+      default: ""
+    }
+  }
+},
+  billing: {
+  billingDay: {
+    type: Number, // 1–31
+  },
+  lastBilledAt: {
+    type: Date,
+    default: null
+  }
+},
 
   messages: [{
     content: {

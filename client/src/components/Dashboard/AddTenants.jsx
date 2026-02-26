@@ -4,8 +4,10 @@ import SummaryApi from "../../common/SummaryApi";
 import toast from "react-hot-toast";
 import AxiosToastError from "../../utils/AxiosToastError";
 import { useNavigate } from "react-router-dom";
+import { BsArrowLeft } from "react-icons/bs";
 
 const AddTenants = () => {
+
   const [tenant, setTenant] = useState({
     name: "",
     email: "",
@@ -13,127 +15,170 @@ const AddTenants = () => {
     room: "",
     rent: "",
   });
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setTenant((prev) => ({ ...prev, [name]: value }));
+    setTenant(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!tenant.name || !tenant.phone || !tenant.room || !tenant.rent) {
-      toast.error("Please fill all required fields");
-      return;
-    }
+  if (!tenant.name || !tenant.phone || !tenant.room || !tenant.rent) {
+    toast.error("Please fill all required fields");
+    return;
+  }
 
-    try {
-      const response = await Axios({
-        ...SummaryApi.add,
-        data: tenant,
+  try {
+    setLoading(true);
+
+    const response = await Axios({
+      ...SummaryApi.add,
+      data: tenant,
+    });
+
+    if (response.data.success) {
+      toast.success("Tenant added successfully!");
+
+      setTenant({
+        name: "",
+        email: "",
+        phone: "",
+        room: "",
+        rent: "",
       });
 
-      if (response.data.success) {
-        toast.success(response.data.message);
-
-        setTenant({ name: "", email: "", phone: "", room: "", rent: "" });
-
-        navigate("/landlorddashboard/landlordstatistics");
-      }
-    } catch (error) {
-      AxiosToastError(error);
+      console.log("Backend Response:", response.data);
+      toast.success("Check tenant phone for SMS notification");
+      navigate("/landlorddashboard/landlordstatistics");
+    } else {
+      toast.error(response.data.message);
     }
-  };
+
+  } catch (error) {
+    AxiosToastError(error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
-    <section className="flex justify-center items-center h-full bg-white px-4 animate-fadeIn">
-      {/* Card */}
-      <div className="w-full max-w-8xl bg-white min-h-150  rounded-2xl p-10
-        transition-all duration-500 ">
-        
-        <h2 className="text-3xl font-bold text-green-600 mb-8 text-center animate-fadeInDown">
+    <section className="flex justify-center items-center  bg-gradient-to-br bg-white p-6">
+
+      {/* FORM CARD */}
+      <div className="w-full border-l-4 rounded-2xl border-green-400 max-w-8xl bg-white p-10 ">
+      
+        {/* TITLE */}
+        <p onClick={() => window.history.back()} className="cursor-pointer flex items-center w-10 text- rounded-lg bg-gray-300 p-2  text-black font-semibold"><BsArrowLeft size={20}/></p>
+        <h2 className="text-3xl font-bold text-green-600 text-center mb-10 tracking-wide">
           Add New Tenant
         </h2>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* Name + Email */}
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex flex-col flex-1">
-              <label className="font-semibold mb-2">Name</label>
+          {/* NAME + EMAIL */}
+          <div className="grid md:grid-cols-2 gap-6">
+
+            <div>
+              <label className="font-semibold text-gray-600 mb-2 block">
+                Tenant Name *
+              </label>
+
               <input
                 type="text"
                 placeholder="Enter tenant name"
                 name="name"
                 value={tenant.name}
                 onChange={handleChange}
-                className="w-full p-4 rounded-lg border border-gray-300 focus:border-green-500 outline-none focus:ring-1 focus:ring-green-200 transition"
+                className="w-full p-4 rounded-xl border border-gray-300
+                focus:border-green-500 outline-none focus:ring-2 focus:ring-green-200 transition"
               />
             </div>
 
-            <div className="flex flex-col flex-1">
-              <label className="font-semibold mb-2">Email</label>
+            <div>
+              <label className="font-semibold text-gray-600 mb-2 block">
+                Email
+              </label>
+
               <input
                 type="email"
                 placeholder="Enter tenant email"
                 name="email"
                 value={tenant.email}
                 onChange={handleChange}
-                className="w-full p-4 rounded-lg border border-gray-300 focus:border-green-500 outline-none focus:ring-1 focus:ring-green-200 transition"
+                className="w-full p-4 rounded-xl border border-gray-300
+                focus:border-green-500 outline-none focus:ring-2 focus:ring-green-200 transition"
               />
             </div>
+
           </div>
 
-          {/* Phone + Room */}
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex flex-col flex-1">
-              <label className="font-semibold mb-2">Phone</label>
+          {/* PHONE + ROOM */}
+          <div className="grid md:grid-cols-2 gap-6">
+
+            <div>
+              <label className="font-semibold text-gray-600 mb-2 block">
+                Phone Number *
+              </label>
+
               <input
                 type="tel"
                 placeholder="Enter phone number"
                 name="phone"
                 value={tenant.phone}
                 onChange={handleChange}
-                className="w-full p-4 rounded-lg border border-gray-300 focus:border-green-500 outline-none focus:ring-1 focus:ring-green-200 transition"
+                className="w-full p-4 rounded-xl border border-gray-300
+                focus:border-green-500 outline-none focus:ring-2 focus:ring-green-200 transition"
               />
             </div>
 
-            <div className="flex flex-col flex-1">
-              <label className="font-semibold mb-2">Room</label>
+            <div>
+              <label className="font-semibold text-gray-600 mb-2 block">
+                Room Number *
+              </label>
+
               <input
                 type="number"
                 placeholder="Enter room number"
                 name="room"
                 value={tenant.room}
                 onChange={handleChange}
-                className="w-full p-4 rounded-lg border border-gray-300 focus:border-green-500 outline-none focus:ring-1 focus:ring-green-200 transition"
+                className="w-full p-4 rounded-xl border border-gray-300
+                focus:border-green-500 outline-none focus:ring-2 focus:ring-green-200 transition"
               />
             </div>
+
           </div>
 
-          {/* Rent */}
-          <div className="flex flex-col">
-            <label className="font-semibold mb-2">Rent Amount</label>
+          {/* RENT */}
+          <div>
+            <label className="font-semibold text-gray-600 mb-2 block">
+              Monthly Rent Amount *
+            </label>
+
             <input
               type="number"
               placeholder="Enter rent amount"
               name="rent"
               value={tenant.rent}
               onChange={handleChange}
-              className="w-full p-4 rounded-lg border border-gray-300 focus:border-green-500 outline-none focus:ring-1 focus:ring-green-200 transition"
+              className="w-full p-4 rounded-xl border border-gray-300
+              focus:border-green-500 outline-none focus:ring-2 focus:ring-green-200 transition"
             />
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="bg-green-600 text-white py-4 rounded-lg font-semibold
-              transition-all duration-300 hover:bg-green-700 hover:scale-[1.02] active:scale-95 shadow-md"
-          >
-            Add Tenant
+          {/* SUBMIT BUTTON */}
+         <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-700 transition hover:scale-[1.02] active:scale-95 shadow-md disabled:opacity-50"
+            >
+              {loading ? "Processing..." : "Add Tenant"}
           </button>
+
         </form>
       </div>
     </section>

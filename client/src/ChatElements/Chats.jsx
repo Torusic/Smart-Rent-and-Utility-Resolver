@@ -140,7 +140,7 @@ const Chats = ({ onSelectChat, activeChatId }) => {
   };
 
   return (
-    <div className="lg:shadow-md py-1 rounded w-100 h-full bg-green-50  lg:px-2 ml-0">
+    <div className="lg:shadow-md py-1 z-50 rounded-t-2xl w-90 rounded-b-2xl   border-t-5 border-b-5 border-green-500 h-full bg-white  lg:px-2 ml-0">
       <h2 className="font-bold text-sm p-2 text-green-400">Chats</h2>
 
       {/* Search */}
@@ -170,8 +170,8 @@ const Chats = ({ onSelectChat, activeChatId }) => {
               onClick={() =>{handleSelectChat(chat)
                 setStatus("chat")
               }}
-              className={`  px-2- py-3 rounded border-white  border-b-green-200 cursor-pointer  px-2 hover:bg-green-200 flex justify-between items-center ${
-                activeChatId === chat._id ? "bg-green-200 " : "bg-white"
+              className={`  px-2- py-3 rounded border-white  border-b-green-200 cursor-pointer  px-2 hover:bg-green-300 flex justify-between items-center ${
+                activeChatId === chat._id ? "bg-gradient-to-r from-green-400 to-emerald-500 text-white" : "bg-white"
               }`}
             >
               <div className="flex gap-3 items-center">
@@ -187,7 +187,7 @@ const Chats = ({ onSelectChat, activeChatId }) => {
                     )}
                   </span>
                   {chat.lastMessage ? (
-                    <span className="text-xs text-gray-500 truncate w-40">
+                    <span className="text-xs text-gray-700 truncate w-40">
                       {chat.lastMessage.content}
                     </span>
                   ) : (
@@ -197,7 +197,7 @@ const Chats = ({ onSelectChat, activeChatId }) => {
                   )}
                 </div>
               </div>
-              <div className="text-xs text-gray-400 whitespace-nowrap">
+              <div className="text-xs text-gray-700 whitespace-nowrap">
                 {chat.lastMessage?.createdAt
                   ? new Date(chat.lastMessage.createdAt).toLocaleTimeString(
                       [],

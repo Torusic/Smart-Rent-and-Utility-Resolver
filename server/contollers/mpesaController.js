@@ -1,6 +1,8 @@
 import axios from "axios";
 import TenantModel from "../models/Tenant.model.js";
 import { io } from "../server.js";
+import LandLord from "../models/LandLord.model.js";
+
 
 
 export async function startPayment(req, res) {
@@ -120,8 +122,193 @@ export async function mpesaCallback(req, res) {
   }
 }*/}
 
-
 export async function mpesaCallback(req, res) {
+  try {
+
+    const body = req.body;
+
+    const result =
+      body?.Body?.stkCallback ||
+      body?.stkCallback ||
+      body;
+
+    if (!result || result.ResultCode === undefined) {
+      return res.status(400).json({
+        message: "Invalid callback structure",
+        error: true,
+        success: false
+      });
+    }
+
+    if (result.ResultCode !== 0) {
+      return res.status(200).json({
+        message: "Payment failed or cancelled",
+        success: true
+      });
+    }
+
+    const items = result.CallbackMetadata?.Item || [];
+
+    const amount =
+      items.find(i => i.Name === "Amount")?.Value || 0;
+
+    const receipt =
+      items.find(i => i.Name === "MpesaReceiptNumber")?.Value || "";
+
+    const tenant = await TenantModel.findById(result.AccountReference);
+
+    if (!tenant) {
+      return res.status(404).json({
+        message: "Tenant not found",
+        error: true
+      });
+    }
+
+    tenant.payment = tenant.payment || {};
+
+    tenant.payment.totalRent =
+      tenant.payment.totalRent || tenant.rent || 0;
+
+    const historyExists = tenant.payment.history?.some(
+      h => h.transactionId === receipt
+    );
+
+    if (historyExists) {
+      return res.status(200).json({
+        message: "Duplicate transaction ignored",
+        success: true
+      });
+    }
+
+    tenant.payment.amountPaid =
+      (tenant.payment.amountPaid || 0) + amount;
+
+    tenant.payment.lastPaidAmount = amount;
+    tenant.payment.lastPaidAt = new Date();
+
+    tenant.payment.balance =
+      tenant.payment.totalRent - tenant.payment.amountPaid;
+
+    if (tenant.payment.balance <= 0) {
+      tenant.rentStatus = "Paid";
+    }
+    else if (tenant.payment.amountPaid > 0) {
+      tenant.rentStatus = "Partially Paid";
+    }
+    else {
+      tenant.rentStatus = "Unpaid";
+    }
+
+    tenant.payment.history = tenant.payment.history || [];
+
+    tenant.payment.history.push({
+      description: "Rent Payment",
+      amount,
+      status: "SUCCESS",
+      date: new Date(),
+      transactionId: receipt
+    });
+
+    const electricityStatus =
+      tenant.payment.balance > 0 ? "OFF" : "ON";
+
+    const waterStatus =
+      tenant.payment.balance > 0 ? "OFF" : "ON";
+
+    tenant.relay = tenant.relay || {};
+
+    tenant.relay.electricity = electricityStatus === "ON";
+    tenant.relay.water = waterStatus === "ON";
+
+    tenant.utilities = tenant.utilities || {};
+
+    tenant.utilities.electricityStatus = electricityStatus;
+    tenant.utilities.waterStatus = waterStatus;
+
+    if (tenant.deviceId) {
+      io.to(tenant.deviceId).emit("deviceCommand", {
+        electricity: electricityStatus,
+        water: waterStatus
+      });
+    }
+
+    await tenant.save();
+
+    const landlordId = tenant.landlord;
+
+    const tenants = await TenantModel.find({
+      landlord: landlordId
+    });
+
+    const rentedRooms = tenants.length;
+
+    const landlordInfo = await LandLord.findById(landlordId);
+
+    const totalRooms = landlordInfo?.totalRooms || 0;
+    const vacantRooms = Math.max(0, totalRooms - rentedRooms);
+
+    let rentPaid = 0,
+        rentUnpaid = 0,
+        waterPaid = 0,
+        waterUnpaid = 0,
+        electricityPaid = 0,
+        electricityUnpaid = 0;
+
+    const totalTenants = tenants.length || 1;
+
+    tenants.forEach(t => {
+
+      if (t.rentStatus === "Paid") rentPaid++;
+      else if (t.rentStatus === "Partially Paid") rentPaid++; 
+      else rentUnpaid++;
+
+      if (t.utilities?.waterStatus === "ON") waterPaid++;
+      else waterUnpaid++;
+
+      if (t.utilities?.electricityStatus === "ON") electricityPaid++;
+      else electricityUnpaid++;
+
+    });
+
+    const utilitiesGraph = {
+      rent: {
+        paid: Number(((rentPaid / totalTenants) * 100).toFixed(2)),
+        unpaid: Number(((rentUnpaid / totalTenants) * 100).toFixed(2))
+      },
+
+      water: {
+        paid: Number(((waterPaid / totalTenants) * 100).toFixed(2)),
+        unpaid: Number(((waterUnpaid / totalTenants) * 100).toFixed(2))
+      },
+
+      electricity: {
+        paid: Number(((electricityPaid / totalTenants) * 100).toFixed(2)),
+        unpaid: Number(((electricityUnpaid / totalTenants) * 100).toFixed(2))
+      }
+    };
+
+    io.emit("paymentUpdate", {
+      rentedRooms,
+      vacantRooms,
+      utilitiesGraph,
+      tenantId: tenant._id
+    });
+
+    return res.status(200).json({
+      message: "Payment processed successfully",
+      success: true
+    });
+
+  } catch (error) {
+    console.error("Error processing payment:", error);
+
+    return res.status(200).json({
+      message: "Payment processed successfully",
+      success: true
+    });
+  }
+}
+{/**export async function mpesaCallback(req, res) {
   try {
     const body = req.body;
 
@@ -204,4 +391,4 @@ export async function mpesaCallback(req, res) {
     });
   }
 }
-
+*/}

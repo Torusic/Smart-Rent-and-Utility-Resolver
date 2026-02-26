@@ -22,8 +22,8 @@ const Tenant = ({ onLogout,closeMenu }) => {
     { name: "Dashboard", path: "/tenantdashboard/tenantstatistics", icon: <MdDashboard size={20} /> },
     { name: "Chat", path: "/tenantdashboard/tenantChat", icon: <MdChat size={20} /> },
     { name: "Update password", path: "/tenantdashboard/updatePassword", icon: <MdEdit size={20} /> },
-      {name:"History", icon:<FaHistory size={20} />},
-    { name: "Logout", path: null, icon: <MdLogout size={20} /> },
+      {name:"History", path: "/tenantdashboard/history",icon:<FaHistory size={20} />},
+    { name: "Logout",  path:null, icon: <MdLogout size={20} /> },
   ];
 
   return (
@@ -62,10 +62,10 @@ const Tenant = ({ onLogout,closeMenu }) => {
           );
         })}
       </ul>
-        <div className='p-3 animate-pulse w-35 grid mt-2 gap-1 cursor-pointer ml-auto shadow-md rounded-full bg-green-200 items-center justify-center'>
+        {/**<div className='p-3 animate-pulse w-35 grid mt-2 gap-1 cursor-pointer ml-auto shadow-md rounded-full bg-green-200 items-center justify-center'>
           <FaRobot size={30} className='animate-pulse ml-9  cursor-pointer text-green-600 '/>
           <p className='text-sm font-semibold text-green-700'>Ask FAQs to AI</p>
-        </div>
+        </div>*/}
     </aside>
   );
 };

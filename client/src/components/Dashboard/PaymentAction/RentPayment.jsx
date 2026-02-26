@@ -42,7 +42,7 @@ function RentPayment({ close, refreshDashboard, balance }) {
 
             if (newBalance !== balance) {
               setLoading(false)
-              refreshDashboard() // update parent dashboard
+              refreshDashboard(window.dispatchEvent(new Event("paymentSuccess"))) // update parent dashboard
               toast.success("Payment confirmed!")
               clearInterval(interval)
               close() // close modal after successful payment

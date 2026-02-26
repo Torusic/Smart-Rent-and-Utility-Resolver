@@ -4,7 +4,7 @@ const messageSchema = new mongoose.Schema(
   {
     sender: {
       type: mongoose.Schema.Types.ObjectId,
-      refPath: "senderModel", // could be landlord or tenant
+      refPath: "senderModel",
       required: true,
     },
     senderModel: {
@@ -22,11 +22,24 @@ const messageSchema = new mongoose.Schema(
       enum: ["LandLord", "Tenant"],
       required: true,
     },
+
+    category: {
+      type: String,
+      enum: [
+        "Rent",
+        "Electricity",
+        "Water",
+        "Maintenance",
+        "Announcement",
+        "General",
+      ],
+      default: "General",
+    },
+
     content: { type: String, required: true },
     read: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
-
-const MessageModel=mongoose.model("Message",messageSchema)
+const MessageModel=mongoose.model("Message",messageSchema) 
 export default MessageModel;

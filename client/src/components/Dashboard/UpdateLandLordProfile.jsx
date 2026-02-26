@@ -5,6 +5,7 @@ import Axios from '../../utils/Axios';
 import SummaryApi from '../../common/SummaryApi';
 import toast from 'react-hot-toast';
 import Divider from '../Divider';
+import { BsArrowLeft } from 'react-icons/bs';
 
 const UpdateLandLordProfile = ({ dark }) => {
   const [landlordData, setLandlordData] = useState({
@@ -61,12 +62,18 @@ const UpdateLandLordProfile = ({ dark }) => {
   
 
   return (
-    <section className="overflow-y-auto scrollbar-hidden p-4 bg-gray-50 h-full">
-      <div className={`max-w-7xl mx-auto bg-white  rounded-2xl p-8 
+    <section className="overflow-y-auto scrollbar-hidden  p-2 bg-gray-50 h-full">
+      <div className={`max-w-7xl mx-auto bg-white border-l-4  border-green-400  rounded-2xl p-8 
                       transition-all duration-500 `}>
-        <h2 className="text-2xl font-bold text-green-600 mb-6 text-center">
-          Update My Profile
-        </h2>
+                        <div className='flex items-center gap-3'>    
+                                <p onClick={() => window.history.back()} className="cursor-pointer  flex items-center rounded-lg bg-gray-300 p-2  text-gray-500 hover:text-gray-700"><BsArrowLeft size={20}/></p>
+                                <h2 className="text-2xl font-bold text-green-600  text-center flex items-center ">
+                                  Update My Profile
+                                </h2>
+                                
+                          </div>
+              
+        <p className='text-gray-500 text-sm italic py-4'>(Click the field to edit or update)</p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           {/* Name + Email */}
@@ -79,7 +86,7 @@ const UpdateLandLordProfile = ({ dark }) => {
                 value={landlordData.name}
                 onChange={handleChange}
                  onClick={()=>setNameText(true)}
-                className={`p-3 ${nameText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                className={`p-3 ${nameText? "text-black":"text-gray-600"} rounded-lg  text-sm outline-none  bg-gray-100 border-gray-300  focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
                 placeholder="Enter your name"
               />
             </div>
@@ -92,7 +99,7 @@ const UpdateLandLordProfile = ({ dark }) => {
                 value={landlordData.email}
                 onChange={handleChange}
                 onClick={()=>setEmailText(true)}
-                className={`p-3 ${emailText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                className={`p-3 ${emailText? "text-black":"text-gray-600"} rounded-lg  text-sm   bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
                 placeholder="Enter your email"
                 required
               />
@@ -109,7 +116,7 @@ const UpdateLandLordProfile = ({ dark }) => {
                 value={landlordData.phone}
                 onChange={handleChange}
                  onClick={()=>setPhoneText(true)}
-                className={`p-3 ${phoneText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                className={`p-3 ${phoneText? "text-black":"text-gray-600"} rounded-lg  text-sm   bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
                 placeholder="Enter phone number"
               />
             </div>
@@ -123,7 +130,7 @@ const UpdateLandLordProfile = ({ dark }) => {
                 onChange={handleChange}
            
                 onClick={()=>setRoomText(true)}
-                className={`p-3 ${roomText? "text-black":"text-gray-400"} rounded-lg border  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
+                className={`p-3 ${roomText? "text-black":"text-gray-600"} rounded-lg  text-sm  bg-gray-100 border-gray-300 outline-none focus:ring-2 focus:ring-green-300 focus:border-green-500 transition w-full`}
                 placeholder="Enter total rooms"
               />
             </div>
@@ -132,7 +139,7 @@ const UpdateLandLordProfile = ({ dark }) => {
           {/* Update Button */}
           <button
             type="submit"
-            className="bg-green-600 text-white font-semibold py-3 rounded-lg w-full 
+            className="bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold py-3 rounded-lg w-full 
                        hover:bg-green-700 hover:scale-[1.02] active:scale-95 transition-all shadow-md"
                        onClick={()=>{
                         setNameText(false)
@@ -148,7 +155,7 @@ const UpdateLandLordProfile = ({ dark }) => {
       <Divider />
 
       {/* Messages Section */}
-      <div className="mt-1">
+      <div className="mt-1 border-l-4 rounded-2xl border-gray-400">
         <Message />
       </div>
     </section>

@@ -8,11 +8,15 @@ import generateAccessToken from "../utils/generateAccessToken.js";
 import generateRefreshToken from "../utils/generateRefreshToken.js";
 import generatePassword from "../utils/generatePassword.js";
 import TenantModel from "../models/Tenant.model.js";
-import sndSMS from "../utils/sndSMS.js";
+
 import bcrypt from "bcryptjs";
 import { response } from "express";
 import MessageModel from "../models/Message.model.js";
 import axios from "axios";
+import { io } from "../server.js";
+import { checkAndResetBilling } from "../utils/billingHelper.js";
+import sendSMS from "../utils/sendSMS.js";
+import normalizeKenyaPhone from "../utils/normalizeKenyanPhone.js";
 
 
 export async function registerController(req,res){
@@ -132,14 +136,19 @@ export async function commonLoginController(req, res) {
       });
     }
 
-    //  Try landlord first
-    let user = await LandLord.findOne({ phone });
-    let role = "landlord";
+    // Allow login using any phone format 
+    let user = await TenantModel.findOne({
+      phone: phone.toString().trim()
+    });
+
+    let role = "tenant";
 
     if (!user) {
-      //  If not landlord, try tenant
-      user = await TenantModel.findOne({ phone });
-      role = "tenant";
+      user = await LandLord.findOne({
+        phone: phone.toString().trim()
+      });
+
+      role = "landlord";
     }
 
     if (!user) {
@@ -151,7 +160,11 @@ export async function commonLoginController(req, res) {
     }
 
     // Check password
-    const checkPassword = await bcryptjs.compare(password, user.password);
+    const checkPassword = await bcryptjs.compare(
+      password.trim(),
+      user.password
+    );
+
     if (!checkPassword) {
       return res.status(400).json({
         message: "Invalid Password",
@@ -160,15 +173,19 @@ export async function commonLoginController(req, res) {
       });
     }
 
-    //  Generate tokens
+    // Generate tokens
     const accessToken = await generateAccessToken(user._id, role);
     const refreshToken = await generateRefreshToken(user._id, role);
 
-    //  Update last login
+    // Update last login
     if (role === "landlord") {
-      await LandLord.findByIdAndUpdate(user._id, { last_login_date: new Date() });
+      await LandLord.findByIdAndUpdate(user._id, {
+        last_login_date: new Date()
+      });
     } else {
-      await TenantModel.findByIdAndUpdate(user._id, { last_login_date: new Date() });
+      await TenantModel.findByIdAndUpdate(user._id, {
+        last_login_date: new Date()
+      });
     }
 
     const cookiesOption = {
@@ -193,6 +210,7 @@ export async function commonLoginController(req, res) {
         refreshToken,
       },
     });
+
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
@@ -202,13 +220,13 @@ export async function commonLoginController(req, res) {
   }
 }
 
-
 export async function addTenantController(req, res) {
   try {
     const LandLordId = req.userId;
     const { name, email, phone, room, rent } = req.body;
 
-  
+    const today = new Date(); 
+
     if (!name || !email || !phone || !room || !rent) {
       return res.status(400).json({
         message: "All fields are required",
@@ -216,7 +234,6 @@ export async function addTenantController(req, res) {
         success: false,
       });
     }
-
 
     const landlord = await LandLord.findById(LandLordId);
     if (!landlord) {
@@ -227,7 +244,6 @@ export async function addTenantController(req, res) {
       });
     }
 
-    
     if (landlord.rentedRooms >= landlord.totalRooms) {
       return res.status(400).json({
         message: "All rooms fully occupied",
@@ -236,8 +252,11 @@ export async function addTenantController(req, res) {
       });
     }
 
-    
-    const tenantExist = await TenantModel.findOne({ landlord: LandLordId, room });
+    const tenantExist = await TenantModel.findOne({
+      landlord: LandLordId,
+      room,
+    });
+
     if (tenantExist) {
       return res.status(400).json({
         message: `Room ${room} is already occupied`,
@@ -246,11 +265,12 @@ export async function addTenantController(req, res) {
       });
     }
 
-    
     const plainPassword = generatePassword();
     const hashpassword = await bcryptjs.hash(plainPassword, 10);
 
     
+    //const normalizedPhone = normalizeKenyaPhone(phone);
+
     const newTenant = new TenantModel({
       landlord: LandLordId,
       name,
@@ -261,19 +281,30 @@ export async function addTenantController(req, res) {
       role: "tenant",
       password: hashpassword,
       deviceId: `Room ${room}`,
+      billing: {
+        billingDay: today.getDate(),
+        lastBilledAt: today,
+      },
     });
 
     const savedTenant = await newTenant.save();
 
-  
     landlord.Tenant.push(savedTenant._id);
     landlord.rentedRooms += 1;
     landlord.vacantRooms = landlord.totalRooms - landlord.rentedRooms;
     await landlord.save();
 
+    try {
+      await sendSMS(
+       //normalizedPhone,
+        `Welcome ${name}! You have been registered as tenant in Room ${room}. Your login password is ${plainPassword}`
+      );
+    } catch (smsError) {
+      console.log("SMS send failed:", smsError.message);
+    }
+
     
     const recipients = Array.isArray(email) ? email : [email];
- 
 
     if (recipients.length > 0) {
       await sendEmail({
@@ -287,7 +318,6 @@ export async function addTenantController(req, res) {
       });
     }
 
-   
     return res.status(200).json({
       message: "Tenant added successfully",
       error: false,
@@ -300,10 +330,9 @@ export async function addTenantController(req, res) {
         room: savedTenant.room,
         rent: savedTenant.rent,
         role: savedTenant.role,
-        password: plainPassword, 
+        password: plainPassword,
       },
     });
-
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
@@ -312,7 +341,6 @@ export async function addTenantController(req, res) {
     });
   }
 }
-
 
 export async function vaccantRoomsController(req, res) {
   try {
@@ -398,6 +426,47 @@ export async function searchTenant(req,res){
         
     }
 }
+export async function getTenantByIdController(req, res) {
+  try {
+    const landlordId = req.userId;
+    const tenantId = req.params.id;
+
+    if (!tenantId) {
+      return res.status(400).json({
+        message: "Tenant ID required",
+        error: true,
+        success: false
+      });
+    }
+
+    const tenant = await TenantModel.findOne({
+      _id: tenantId,
+      landlord: landlordId
+    }).select("-password");
+
+    if (!tenant) {
+      return res.status(404).json({
+        message: "Tenant not found",
+        error: true,
+        success: false
+      });
+    }
+
+    return res.status(200).json({
+      message: "Tenant fetched successfully",
+      error: false,
+      success: true,
+      data: tenant
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || "Server error",
+      error: true,
+      success: false
+    });
+  }
+}
 export async function removeTenantController(req, res) {
   try {
     const LandLordId = req.userId;
@@ -438,12 +507,12 @@ export async function removeTenantController(req, res) {
     landlord.vacantRooms = landlord.totalRooms - landlord.rentedRooms;
     await landlord.save();
 
-    // Delete tenant record
+ 
     await TenantModel.findByIdAndDelete(tenantId);
 
-    //  Prepare SMS number & send
-    const formattedNumber = tenant.phone; // or format as needed
-    await sndSMS(
+    
+    const formattedNumber = tenant.phone; 
+    await sendSMS(
       formattedNumber,
       `Dear ${tenant.name}, you have been removed from ${landlord.name}'s property.`
     );
@@ -462,83 +531,88 @@ export async function removeTenantController(req, res) {
     });
   }
 }
+export async function landlordDashboardController(req, res) {
+  try {
 
-export async function landlordDashboardController(req,res){
-    try {
-        const landLordId=req.userId
-        
-        const landlordInfo=await LandLord.findById(landLordId)
-        if(!landlordInfo){
-            return res.status(400).json({
-                message:"Landlord not found",
-                error:true,
-                success:false
-            })
-        }
-        const tenants=await TenantModel.find({
-            landlord:landLordId
-        })
-        const rentedRooms=tenants.length
-        const totalRooms=landlordInfo.totalRooms||0
-        const vacantRooms=totalRooms-rentedRooms
+    const landLordId = req.userId;
 
-        let rentPaid=0,
-           rentUnpaid=0,
-           waterPaid=0,
-           waterUnpaid=0,
-           electricityPaid=0,
-           electricityUnpaid=0
+    const landlordInfo = await LandLord.findById(landLordId);
 
-           tenants.forEach((t)=>{
-              if(t.rentStatus==="Paid")rentPaid++
-            else rentUnpaid++
-
-            if(t.utilities.water==="Paid")waterPaid++
-            else waterUnpaid++
-
-              if(t.utilities.electricity==="Paid")electricityPaid++
-            else electricityUnpaid++
-
-
-           })
-       const totalTenants=tenants.length
-
-       const utiliytiesGraph={
-        rent:{
-            paid:((rentPaid/totalTenants)*100).toFixed(2),
-            unpaid:((rentUnpaid/totalTenants)*100).toFixed(2)
-        },
-        water:{
-            paid:((waterPaid/totalTenants)*100).toFixed(2),
-            unpaid:((waterUnpaid/totalTenants)*100).toFixed(2)
-        },
-         electricity:{
-            paid:((electricityPaid/totalTenants)*100).toFixed(2),
-            unpaid:((electricityUnpaid/totalTenants)*100).toFixed(2)
-        },
-       }
-       return res.status(200).json({
-        message:"LandLord dashboard fetched succesfully",
-        error:false,
-        success:true,
-        data:{
-             totalRooms,
-            rentedRooms,
-            vacantRooms,
-            utiliytiesGraph
-           
-        }
-       })
-
-        
-    } catch (error) {
-        return res.status(500).json({
-            message:error.message||error,
-            error:true,
-            success:false
-        })
-        
+    if (!landlordInfo) {
+      return res.status(400).json({
+        message: "Landlord not found",
+        error: true,
+        success: false
+      });
     }
+
+    const tenants = await TenantModel.find({
+      landlord: landLordId
+    });
+
+    const rentedRooms = tenants.length;
+    const totalRooms = landlordInfo.totalRooms || 0;
+    const vacantRooms = totalRooms - rentedRooms;
+
+    let rentPaid = 0,
+        rentUnpaid = 0,
+        waterPaid = 0,
+        waterUnpaid = 0,
+        electricityPaid = 0,
+        electricityUnpaid = 0;
+
+    tenants.forEach(t => {
+
+      if (t.rentStatus === "Paid") rentPaid++;
+      else if(t.rentStatus==="Partially Paid") rentPaid++
+      else rentUnpaid++;
+
+      if (t.utilities?.waterStatus === "ON") waterPaid++;
+      else waterUnpaid++;
+
+      if (t.utilities?.electricityStatus === "ON") electricityPaid++;
+      else electricityUnpaid++;
+
+    });
+
+    const totalTenants = tenants.length || 1; // avoid division by zero
+
+    const utilitiesGraph = {
+      rent: {
+        paid: Number(((rentPaid / totalTenants) * 100).toFixed(2)),
+        unpaid: Number(((rentUnpaid / totalTenants) * 100).toFixed(2))
+      },
+
+      water: {
+        paid: Number(((waterPaid / totalTenants) * 100).toFixed(2)),
+        unpaid: Number(((waterUnpaid / totalTenants) * 100).toFixed(2))
+      },
+
+      electricity: {
+        paid: Number(((electricityPaid / totalTenants) * 100).toFixed(2)),
+        unpaid: Number(((electricityUnpaid / totalTenants) * 100).toFixed(2))
+      }
+    };
+
+    return res.status(200).json({
+      message: "Landlord dashboard fetched successfully",
+      error: false,
+      success: true,
+      data: {
+        totalRooms,
+        rentedRooms,
+        vacantRooms,
+        utilitiesGraph
+      }
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message || error,
+      error: true,
+      success: false
+    });
+  }
 }
 
 export async function tenantDashboardController(req, res) {
@@ -546,6 +620,7 @@ export async function tenantDashboardController(req, res) {
     const tenantId = req.userId;
 
     const tenant = await TenantModel.findById(tenantId).populate("landlord");
+    await checkAndResetBilling(tenant);
     if (!tenant) {
       return res.status(404).json({
         message: "Tenant not found",
@@ -588,6 +663,7 @@ export async function tenantDashboardController(req, res) {
         balance: totalRent - amountPaid,
         lastPaidAmount: tenant.payment?.lastPaidAmount || 0,
         lastPaidAt: tenant.payment?.lastPaidAt || null,
+        history:tenant.payment?.history || []
       },
 
       utilities: {
@@ -663,7 +739,7 @@ export async function getAllTenantsController(req, res) {
 
     const tenantsWithDetails = await Promise.all(
       tenants.map(async (tenant) => {
-
+         await checkAndResetBilling(tenant);
         const lastMessage = await MessageModel.findOne({
           $or: [
             { sender: LandLordId, receiver: tenant._id },
@@ -681,7 +757,6 @@ export async function getAllTenantsController(req, res) {
         const amountPaid = tenant.payment?.amountPaid || 0;
         const balance = totalRent - amountPaid;
 
-        // 🔥 accumulate apartment totals
         totalExpected += totalRent;
         totalPaid += amountPaid;
 
@@ -796,35 +871,127 @@ export async function landlordDetails(req,res){
         
     }
 }
-export const manageUtilities = async (req, res) => {
+
+
+export async function updateTenantsController(req, res) {
   try {
-    const { tenantId, electricity, water } = req.body;
+    const landlordId = req.userId;
+    const tenantId = req.params.id;
 
-    const tenant = await TenantModel.findById(tenantId);
+    const allowedFields = ["name", "email", "phone", "room", "rent"];
+
+    const tenant = await TenantModel.findOne({
+      _id: tenantId,
+      landlord: landlordId
+    });
+
     if (!tenant) {
-      return res.status(404).json({ message: "Tenant not found" });
+      return res.status(404).json({
+        message: "Tenant not found or unauthorized access",
+        error: true,
+        success: false
+      });
     }
 
-    if (electricity) {
-      tenant.relay.electricity = electricity === "ON";
-      tenant.utilities.electricityStatus = electricity;
+    if (req.body.room && req.body.room !== tenant.room) {
+      const roomOccupied = await TenantModel.findOne({
+        landlord: landlordId,
+        room: req.body.room,
+        _id: { $ne: tenantId }
+      });
+
+      if (roomOccupied) {
+        return res.status(400).json({
+          message: "Room is already occupied",
+          error: true,
+          success: false
+        });
+      }
     }
 
-    if (water) {
-      tenant.relay.water = water === "ON";
-      tenant.utilities.waterStatus = water;
+    for (let key of allowedFields) {
+      if (req.body[key] !== undefined) {
+        if (key === "phone") {
+          const existingTenant = await TenantModel.findOne({
+            phone: req.body.phone,
+            _id: { $ne: tenantId }
+          });
+
+          if (existingTenant) {
+            return res.status(400).json({
+              message: "Phone number already exists",
+              error: true,
+              success: false
+            });
+          }
+        }
+
+        tenant[key] = req.body[key];
+      }
     }
 
     await tenant.save();
 
-    res.json({
+    return res.status(200).json({
+      message: "Tenant updated successfully",
+      error: false,
       success: true,
-      message: "Utility updated"
+      data: tenant
     });
 
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error" });
+    return res.status(500).json({
+      message: error.message || "Server error",
+      error: true,
+      success: false
+    });
+  }
+}
+export const manageUtilities = async (req, res) => {
+  try {
+
+    const { tenantId, electricity, water } = req.body;
+
+    const tenant = await TenantModel.findById(tenantId);
+
+    if (!tenant) {
+      return res.status(404).json({
+        message: "Tenant not found"
+      });
+    }
+
+    if (electricity !== undefined) {
+      tenant.utilities.electricityStatus = electricity;
+      tenant.relay.electricity = electricity === "ON";
+    }
+
+    if (water !== undefined) {
+      tenant.utilities.waterStatus = water;
+      tenant.relay.water = water === "ON";
+    }
+
+    await tenant.save();
+
+    
+    if (tenant.deviceId) {
+
+      io.to(tenant.deviceId).emit("deviceCommand", {
+        electricity: tenant.utilities.electricityStatus,
+        water: tenant.utilities.waterStatus
+      });
+
+      console.log("📡 Device command broadcasted:", tenant.deviceId);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Utility updated successfully"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message
+    });
   }
 };
 
@@ -977,7 +1144,7 @@ export async function getTenantUpdates(req, res) {
 export async function sendChatToTenants(req,res){
   try {
     const LandLordId=req.userId;
-    const{tenantId,content}=req.body;
+    const{tenantId,content,category}=req.body;
 
     if(!tenantId||!content){
       return res.status(400).json({
@@ -985,54 +1152,38 @@ export async function sendChatToTenants(req,res){
         error:true,
         success:false
       })
-     
-
     }
-     const landlord=await LandLord.findById(LandLordId);
-      if(!landlord){
-        return res.status(400).json({
-          message:"Landlord nOt found",
-          error:true,
-          success:false
-        })
-      }
-      const tenant=await TenantModel.findById(tenantId)
-      if(!tenant){
-        return res.status(400).json({
-          message:"Tenant Does not exist",
-          error:true,
-          success:false
-        })
 
-      }
-      const newMessage=new MessageModel({
-        sender:LandLordId,
-        senderModel:"LandLord",
-        receiver:tenantId,
-        receiverModel:"Tenant",
-        content
-      })
-      await newMessage.save()
-      return res.status(200).json({
-        message:"Chat sent Successfully",
-        error:false,
-        success:true
-      })
-    
+    const newMessage=new MessageModel({
+      sender:LandLordId,
+      senderModel:"LandLord",
+      receiver:tenantId,
+      receiverModel:"Tenant",
+      content,
+      category: category?.trim() ? category : "General"
+    })
+
+    await newMessage.save()
+
+    return res.status(200).json({
+      message:"Chat sent Successfully",
+      error:false,
+      success:true
+    })
+
   } catch (error) {
     return res.status(500).json({
       message:error.message||error,
       error:true,
       success:false
     })
-    
   }
 }
-// 📥 Fetch chat history between landlord & tenant
+//  Fetch chat history between landlord & tenant
 export async function getMessagesController(req, res) {
   try {
     const landlordId = req.userId;
-    const { tenantId } = req.query;
+    const { tenantId, category } = req.query;
 
     if (!tenantId) {
       return res.status(400).json({
@@ -1042,19 +1193,36 @@ export async function getMessagesController(req, res) {
       });
     }
 
-    const messages = await MessageModel.find({
+    let filter = {
       $or: [
         { sender: landlordId, receiver: tenantId },
         { sender: tenantId, receiver: landlordId },
       ],
-    }).sort({ createdAt: 1 }); // oldest → newest
+    };
+
+    
+    if (category && category !== "All") {
+      filter.category = category;
+    }
+
+    const messages = await MessageModel.find(filter)
+      .sort({ createdAt: 1 }); 
+
+    
+    const unreadCount = await MessageModel.countDocuments({
+      sender: tenantId,
+      receiver: landlordId,
+      read: false,
+    });
 
     return res.status(200).json({
       message: "Chat fetched successfully",
       error: false,
       success: true,
       data: messages,
+      unreadCount,
     });
+
   } catch (error) {
     return res.status(500).json({
       message: error.message || error,
@@ -1067,7 +1235,7 @@ export async function getMessagesController(req, res) {
 export async function sendChatToLandlord(req, res) {
   try {
     const tenantId = req.userId;
-    const { landlordId, content } = req.body;
+    const { landlordId, content,category } = req.body;
 
     if (!landlordId || !content) {
       return res.status(400).json({
@@ -1101,6 +1269,7 @@ export async function sendChatToLandlord(req, res) {
       receiver: landlordId,
       receiverModel: "LandLord",
       content,
+      category: category?.trim() ? category : "General"
     });
 
     await newMessage.save();

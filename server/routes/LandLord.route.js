@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addTenantController, commonLoginController,getAllTenantsController, getMessagesController, getTenantMessages, getTenantUpdates, getUnreadMessagesForLandlord, getUnreadMessagesForTenant, landlordDashboardController, landlordDetails, manageUtilities, markMessagesAsRead, markTenantMessagesAsRead, registerController, removeTenantController, searchTenant, sendChatToLandlord, sendChatToTenants, sendMessageToTenants, tenantDashboardController, tenantPasswordUpdate, updateLandlordController, vaccantRoomsController, verifyEmailController } from "../contollers/LandLord.Controller.js";
+import { addTenantController, commonLoginController,getAllTenantsController, getMessagesController, getTenantByIdController, getTenantMessages, getTenantUpdates, getUnreadMessagesForLandlord, getUnreadMessagesForTenant, landlordDashboardController, landlordDetails, manageUtilities, markMessagesAsRead, markTenantMessagesAsRead, registerController, removeTenantController, searchTenant, sendChatToLandlord, sendChatToTenants, sendMessageToTenants, tenantDashboardController, tenantPasswordUpdate, updateLandlordController, updateTenantsController, vaccantRoomsController, verifyEmailController } from "../contollers/LandLord.Controller.js";
 import auth from "../middleware/auth.js";
 import { LogInstance } from "twilio/lib/rest/serverless/v1/service/environment/log.js";
 
@@ -19,6 +19,7 @@ LandLordRoute.get('/vacantRooms',auth,vaccantRoomsController)
 LandLordRoute.get('/Ldashboard',auth,landlordDashboardController)
 LandLordRoute.get('/get',auth,getAllTenantsController)
 LandLordRoute.put('/update',auth,updateLandlordController)
+LandLordRoute.put('/tenant/:id', auth, updateTenantsController);
 LandLordRoute.get('/user',auth,landlordDetails)
 LandLordRoute.post('/broadcast',auth,sendMessageToTenants)
 LandLordRoute.get('/getBroadcast',auth,getTenantUpdates)
@@ -32,6 +33,7 @@ LandLordRoute.get("/unread/landlord", auth, getUnreadMessagesForLandlord);
 LandLordRoute.get("/unread/tenant", auth, getUnreadMessagesForTenant);
 LandLordRoute.post("/messages/mark-read", auth, markMessagesAsRead);
 LandLordRoute.delete('/delete',auth,removeTenantController)
+LandLordRoute.get('/getTenantById/:id',auth,getTenantByIdController)
 
  
 

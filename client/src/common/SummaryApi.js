@@ -1,6 +1,7 @@
 export const baseURL = "http://localhost:8080";
 
 const SummaryApi = {
+  /* ================= AUTH ================= */
   register: {
     url: "/api/LandLord/register",
     method: "post",
@@ -9,6 +10,8 @@ const SummaryApi = {
     url: "/api/LandLord/login",
     method: "post",
   },
+
+  /* ================= LANDLORD ================= */
   landlordDashboard: {
     url: "/api/LandLord/Ldashboard",
     method: "get",
@@ -33,68 +36,94 @@ const SummaryApi = {
     url: "/api/LandLord/broadcast",
     method: "post",
   },
-  search: {
-    url: "/api/LandLord/search",
-    method: "get",
-  },
   getBroadcast: {
     url: "/api/LandLord/getBroadcast",
     method: "get",
   },
+  search: {
+    url: "/api/LandLord/search",
+    method: "get",
+  },
+  getTenantById: (id) => ({
+  url: `/api/LandLord/tenant/${id}`,
+  method: "get"
+}),
+  removeTenant: {
+    url: "/api/LandLord/delete",
+    method: "delete",
+  },
+  getVaccantRooms: {
+    url: "/api/LandLord/vacantRooms",
+    method: "get",
+  },
+  manageUtilities: {
+    url: "/api/LandLord/manageUtilities",
+    method: "post",
+  },
 
-  // Landlord <-> Tenant chat
-  getChat: (tenantId) => ({
-    url: `/api/LandLord/getChats?tenantId=${tenantId}`,
+  
+  getChat: (tenantId, category = "All") => ({
+    url: `/api/LandLord/getChats?tenantId=${tenantId}&category=${category}`,
     method: "get",
   }),
-  sendChat: (tenantId) => ({
-  url: "/api/LandLord/message",
-  method: "post",
-  tenantId,
-}),
-makePayment: {
-  url: "/api/mpesa/stk", // your backend STK Push endpoint
-  method: "post",
-},
+
+  //  Landlord sends message
+  sendChat: {
+    url: "/api/LandLord/message",
+    method: "post",
+  },
+
+ 
+  getUnreadForLandlord: {
+    url: "/api/LandLord/unread/landlord",
+    method: "get",
+  },
 
 
-  // Tenant-specific routes
+  markLandlordMessagesRead: {
+    url: "/api/LandLord/messages/mark-read",
+    method: "post",
+  },
+
+ 
+
   tenantDashboard: {
     url: "/api/LandLord/TDashboard",
     method: "get",
   },
-  sendChatToLandlord: (landlordId) => ({
-  url: "/api/LandLord/tenant/send",
-  method: "post",
-  landlordId,
-}),
+
   
-  getTenantChats: (landlordId) => ({
-    url: `/api/LandLord/tenant/getChats?landlordId=${landlordId}`,
+  sendChatToLandlord: {
+    url: "/api/LandLord/tenant/send",
+    method: "post",
+  },
+
+  
+  getTenantChats: (landlordId, category = "All") => ({
+    url: `/api/LandLord/tenant/getChats?landlordId=${landlordId}&category=${category}`,
     method: "get",
   }),
+
+  getUnreadForTenant: {
+    url: "/api/LandLord/unread/tenant",
+    method: "get",
+  },
+
+  
   markTenantMessagesAsRead: {
     url: "/api/LandLord/tenant/markRead",
     method: "put",
   },
-  removeTenant:{
-    url:"/api/LandLord/delete",
-    method:"delete"
-  },
-  getVaccantRooms:{
-    url:"/api/LandLord/vacantRooms",
-    method:"get"
-  },
-  updateTenantPassword:{
-    url:"/api/LandLord/updateTenantPassword",
-    method:"put"
-  },
-  manageUtilities: {
-  url: "/api/LandLord/manageUtilities",
-  method: "post"
-}
 
+  updateTenantPassword: {
+    url: "/api/LandLord/updateTenantPassword",
+    method: "put",
+  },
+
+  makePayment: {
+    url: "/api/mpesa/stk",
+    method: "post",
+  },
 };
-
 
 export default SummaryApi;
