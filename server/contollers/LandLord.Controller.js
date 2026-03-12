@@ -19,6 +19,7 @@ import sendSMS from "../utils/sendSMS.js";
 import normalizeKenyaPhone from "../utils/normalizeKenyanPhone.js";
 
 
+
 export async function registerController(req,res){
     try {
         const{name,email,phone,password,totalRooms}=req.body;
@@ -388,7 +389,7 @@ export async function vaccantRoomsController(req, res) {
 
 export async function searchTenant(req,res){
     try {
-        const landlordId=req.userId
+        const userId=req.userId
         const{query}=req.query;
 
         if(!query){
@@ -398,7 +399,22 @@ export async function searchTenant(req,res){
                 success:false
             })
         }
-        
+        const landlord=await LandLord.findById(userId)
+        let landlordId;
+
+        if(landlord){
+          landlordId=landlord._id;
+        }else{
+            const tenant = await TenantModel.findById(userId);
+            if (!tenant) {
+                return res.status(404).json({
+                    message: "User not found",
+                    error: true,
+                    success: false
+                });
+            }
+            landlordId = tenant.landlord;
+        }
        const regex = new RegExp(query, "i"); 
         const tenants=await TenantModel.find({
             landlord:landlordId,
@@ -564,7 +580,7 @@ export async function landlordDashboardController(req, res) {
     tenants.forEach(t => {
 
       if (t.rentStatus === "Paid") rentPaid++;
-      else if(t.rentStatus==="Partially Paid") rentPaid++
+      else if(t.rentStatus==="Partially Paid") rentPaid++;
       else rentUnpaid++;
 
       if (t.utilities?.waterStatus === "ON") waterPaid++;
@@ -575,7 +591,7 @@ export async function landlordDashboardController(req, res) {
 
     });
 
-    const totalTenants = tenants.length || 1; // avoid division by zero
+    const totalTenants = tenants.length || 1; 
 
     const utilitiesGraph = {
       rent: {
@@ -712,16 +728,29 @@ export async function tenantDashboardController(req, res) {
 
 export async function getAllTenantsController(req, res) {
   try {
-    const LandLordId = req.userId;
-    const landlord = await LandLord.findById(LandLordId);
+    const userId=req.userId
+    let LandLordId = null;
 
-    if (!landlord) {
-      return res.status(404).json({
-        message: "Landlord not found",
-        error: true,
-        success: false,
-      });
+    
+    const landlord = await LandLord.findById(userId);
+    if(landlord){
+      LandLordId = landlord._id;
     }
+    else{
+      const tenant = await TenantModel.findById(userId);
+
+      if (!tenant) {
+        return res.status(404).json({
+          message: "User not found",
+          error: true,
+          success: false,
+        })
+      }
+      LandLordId=tenant.landlord
+
+    }
+    
+
 
     const tenants = await TenantModel.find({ landlord: LandLordId })
       .sort({ createdAt: -1 });
@@ -778,7 +807,7 @@ export async function getAllTenantsController(req, res) {
     const totalUnpaid = totalExpected - totalPaid;
 
     return res.status(200).json({
-      message: `${landlord.name}'s tenants found`,
+      message: 'Tenants found',
       error: false,
       success: true,
       tenants: tenantsWithDetails,
@@ -1009,7 +1038,7 @@ export async function sendMessageToTenants(req,res){
     });
     await landlord.save();
 
-    // Save message in tenants messages
+   
    await TenantModel.updateMany(
   { _id: { $in: landlord.Tenant.map(t => t._id ? t._id : t) } }, 
   {
@@ -1092,7 +1121,6 @@ export async function tenantPasswordUpdate(req,res){
     
   }
 }
-// Inside LandLord.Controller.js
 
 export async function getTenantUpdates(req, res) {
   try {
@@ -1107,21 +1135,21 @@ export async function getTenantUpdates(req, res) {
       });
     }
 
-    // Get cutoff date (7 days ago)
+   
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // Filter messages newer than 7 days
+    
     const validMessages = tenant.messages.filter(
       (msg) => new Date(msg.createdAt) >= sevenDaysAgo
     );
 
-    // Sort messages by newest first
+    
     const sortedMessages = validMessages.sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
-    // Only take the most recent one
+    
     const latestMessage = sortedMessages.length > 0 ? sortedMessages[0] : null;
 
     return res.status(200).json({
@@ -1164,6 +1192,10 @@ export async function sendChatToTenants(req,res){
     })
 
     await newMessage.save()
+        io.to(tenantId.toString()).emit("newMessage", {
+      ...newMessage.toObject(),
+      chatId: tenantId,
+    });
 
     return res.status(200).json({
       message:"Chat sent Successfully",
@@ -1273,6 +1305,10 @@ export async function sendChatToLandlord(req, res) {
     });
 
     await newMessage.save();
+        io.to(landlordId.toString()).emit("newMessage", {
+      ...newMessage.toObject(),
+      chatId: tenantId,
+    });
 
     return res.status(200).json({
       message: "Message sent successfully",
@@ -1316,7 +1352,7 @@ export async function getTenantMessages(req, res) {
         { sender: tenantId, receiver: landlordId },
         { sender: landlordId, receiver: tenantId },
       ],
-    }).sort({ createdAt: 1 }); // oldest → newest
+    }).sort({ createdAt: 1 }); 
 
     return res.status(200).json({
       message: "Chat history fetched successfully",
@@ -1410,7 +1446,7 @@ export async function getUnreadMessagesForTenant(req, res) {
   }
 }
 
-// Mark all messages as read (generic for both landlord & tenant)
+
 export async function markMessagesAsRead(req, res) {
   try {
     const userId = req.userId;

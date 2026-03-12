@@ -114,7 +114,7 @@ const TenantChats = () => {
   }
 
   return (
-    <section className="max-w-9xl mx-auto mt-2 ml-2 border-r-4 border-gray-400 mr-1 flex flex-col mb-6 h-[640px] rounded-2xl shadow-lg  overflow-hidden bg-gradient-to-t from-[#D1FAE5]">
+    <section className="max-w-9xl mx-auto mt-2 ml-2 bg-white border-r-4 border-gray-400 mr-1 flex flex-col mb-6 h-[640px] rounded-2xl shadow-lg  overflow-hidden bg-gradient-to-t from-[#D1FAE5]">
 
       {/* HEADER */}
       <header className="sticky top-0  bg-white  px-4 py-3 font-semibold shadow-sm">

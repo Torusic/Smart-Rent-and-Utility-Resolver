@@ -185,9 +185,9 @@ const TenantStatistics = () => {
             <IoIosBulb size={40} className='text-yellow-400' />
           </div>
           <div className='grid mr-auto lg:mt-6 mt-4  gap-4 px-8'>
-            <span className='text-gray-900 text-sm font-semibold flex'>
+            <span className='text-gray-900 text-xs font-semibold flex'>
               Status: 
-              <p className='bg-yellow-200 text-yellow-500 py-0.5 px-4 mx-2 rounded-xl'>
+              <p className='bg-yellow-200 text-yellow-500 text-xs py-0.5 px-4 mx-2 rounded-xl'>
                 {dashboard.utilities?.electricity?.status}
               </p>
             </span>
@@ -209,9 +209,9 @@ const TenantStatistics = () => {
             <IoWaterOutline size={40} className='text-blue-400' />
           </div>
           <div className='grid mr-auto gap-4 text-sm font-bold mt-6 px-8'>
-            <span className='text-gray-900 text-sm font-semibold flex'>
+            <span className='text-gray-900 text-xs font-semibold flex'>
               Status: 
-              <p className='bg-blue-200 text-blue-500 text-sm font-semibold py-0.5 px-4 mx-2 rounded-xl'>
+              <p className='bg-blue-200 text-blue-500 text-xs font-semibold py-0.5 px-4 mx-2 rounded-xl'>
                 {dashboard.utilities?.water?.status}
               </p>
             </span>

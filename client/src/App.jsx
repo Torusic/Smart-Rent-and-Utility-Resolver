@@ -1,22 +1,28 @@
+import { Outlet } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import { Socket } from "socket.io-client";
 
-import { Outlet } from 'react-router-dom'
-import React from 'react'
-import { Toaster } from 'react-hot-toast'
+
 function App() {
- 
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (user?.id) {
+      Socket.emit("joinUser", user.id);
+      console.log("Joined socket room:", user.id);
+    }
+  }, []);
 
   return (
     <>
-     
-
-     <main className=''>
-      <Outlet/>
-     </main>
-     <Toaster/>
-   
-     
+      <main>
+        <Outlet />
+      </main>
+      <Toaster />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

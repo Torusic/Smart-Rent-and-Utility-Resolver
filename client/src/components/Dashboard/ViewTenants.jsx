@@ -181,7 +181,7 @@ const ViewTenants = ({ fetchDashboard }) => {
       <div className="bg-white rounded-2xl rounded-2xl border-l-4 border-green-500 shadow-md p-6 mb-6">
         <div className="flex justify-between items-center mb-2">
           <div className="flex justify-between gap-2 items-center">
-            <p onClick={() => window.history.back()} className="cursor-pointer flex items-center rounded-lg bg-gray-300 p-2  text-gray-500 hover:text-gray-700"><BsArrowLeft size={20}/></p>
+            <p onClick={() => window.history.back()} className="cursor-pointer flex items-center rounded-lg bg-gray-100 p-2  text-gray-500 hover:text-gray-700"><BsArrowLeft size={20}/></p>
               <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
                 Tenant Management
              </h2>
@@ -197,7 +197,7 @@ const ViewTenants = ({ fetchDashboard }) => {
 
           </div>
         
-        <p className="text-sm font-semibold flex items-center gap-2 text-gray-700 " >Add tenant<Link to="/landlorddashboard/addtenants" className="bg-gray-300 cursor-pointer p-2 rounded-lg"><IoMdAdd /></Link></p>
+        <p className="text-sm font-semibold flex items-center gap-2 text-gray-700 " >Add tenant<Link to="/landlorddashboard/addtenants" className="bg-gray-200 cursor-pointer p-2 rounded-lg"><IoMdAdd /></Link></p>
         </div>
         
 
@@ -367,7 +367,7 @@ const ViewTenants = ({ fetchDashboard }) => {
                             setAction(true);
                             setRemove(tenant._id);
                           }}
-                          className="px-3 py-1 rounded-lg flex items-center gap-2 cursor-pointe bg-red-100 text-red-700 hover:bg-red-200"
+                          className="px-3 py-1 rounded-lg cursor-pointer flex items-center gap-2 cursor-pointe bg-red-100 text-red-700 hover:bg-red-200"
                         >
                           <RiDeleteBin5Line />
                           Remove

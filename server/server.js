@@ -17,7 +17,7 @@ import aiRoute from './routes/ai.route.js';
 dotenv.config();
 const app = express();
 
-// --------------------- MIDDLEWARES ---------------------
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -47,14 +47,19 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
     credentials: true,
   },
-  allowEIO3: true, // compatible with ESP32 Socket.IO client
+  allowEIO3: true, 
 });
 
 
 io.on("connection", (socket) => {
   console.log("🔌 Client connected:", socket.id);
 
-  // ESP32 registers itself
+  socket.on("joinUser", (userId) => {
+  socket.join(userId);
+  console.log("User joined room:", userId);
+});
+
+  
   socket.on("registerDevice", async (data) => {
     const deviceId = data.deviceId;
     socket.join(deviceId);
@@ -79,54 +84,53 @@ io.on("connection", (socket) => {
 
   // ESP32 sends live status
   socket.on("deviceStatus", async (data) => {
-    console.log(" ESP32 Status:", data);
+  try {
 
-    const tenant = await TenantModel.findOne({ deviceId: data.deviceId });
+    const tenant = await TenantModel.findOne({
+      deviceId: data.deviceId
+    });
+
     if (!tenant) return;
 
-    // Auto cut-off based on payment
-    //const electricityStatus = tenant.payment.balance > 0 ? "OFF" : "ON";
-   // const waterStatus = tenant.payment.balance > 0 ? "OFF" : "ON";
+    const cutoff = tenant.payment?.balance > 0;
 
-  let electricityStatus = tenant.utilities.electricityStatus;
-    let waterStatus = tenant.utilities.waterStatus;
+    let electricityStatus = cutoff ? "OFF" : "ON";
+    let waterStatus = cutoff ? "OFF" : "ON";
 
-    if (tenant.payment.balance > 0) {
-    electricityStatus = "OFF";
-    waterStatus = "OFF";
-    }
+    tenant.relay = tenant.relay || {};
+    tenant.utilities = tenant.utilities || {};
+    tenant.utilities.electricity = tenant.utilities.electricity || {};
+    tenant.utilities.water = tenant.utilities.water || {};
 
-    // Update tenant document
     tenant.relay.electricity = electricityStatus === "ON";
     tenant.relay.water = waterStatus === "ON";
 
     tenant.utilities.electricityStatus = electricityStatus;
     tenant.utilities.waterStatus = waterStatus;
 
-    tenant.utilities.electricity.units = data.powerUnits;
-    tenant.utilities.water.units = data.waterUnits;
+    tenant.utilities.electricity.units = data.powerUnits || 0;
+    tenant.utilities.water.units = data.waterUnits || 0;
 
-    tenant.utilities.electricity.amount = data.powerUnits * 20; 
-    tenant.utilities.water.amount = data.waterUnits * 5;        
+    tenant.utilities.electricity.amount =
+      (data.powerUnits || 0) * 20;
+
+    tenant.utilities.water.amount =
+      (data.waterUnits || 0) * 5;
 
     await tenant.save();
 
-    // Send updated commands back to ESP32
     io.to(data.deviceId).emit("deviceCommand", {
       electricity: electricityStatus,
       water: waterStatus
     });
 
-    // Broadcast updated status to frontend dashboard
-    io.emit("statusUpdate", {
-      room: tenant.room,
-      electricity: tenant.utilities.electricity,
-      water: tenant.utilities.water
-    });
-  });
+  } catch (err) {
+    console.error("Device status error:", err);
+  }
+});
 
   socket.on("disconnect", () => {
-    console.log("❌ Client disconnected:", socket.id);
+    console.log(" Client disconnected:", socket.id);
   });
 });
 
@@ -135,7 +139,7 @@ const PORT = process.env.PORT || 8080;
 
 connectDB().then(() => {
   server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(` Server running on port ${PORT}`);
   });
 });
 

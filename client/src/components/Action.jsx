@@ -59,7 +59,7 @@ const Action = ({ close, cancel, confirm }) => {
 
           <button
             onClick={confirm}
-            className="px-5 py-2 rounded-xl text-xs border cursor-pointer bg-red-400
+            className="px-5 py-2 rounded-xl text-xs border cursor-pointer cursor-pointer bg-gradient-to-r from-red-400 to-red-500
             text-white font-semibold hover:bg-red-500 transition"
           >
             Remove Tenant

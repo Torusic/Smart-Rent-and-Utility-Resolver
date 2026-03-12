@@ -23,6 +23,7 @@ import ChatLayout from "../ChatElements/ChatLayout";
 import Welcome from "../components/Welcome";
 import UpdateTenantPassword from "../components/Dashboard/updateTenantPassword";
 import History from "../components/Dashboard/PaymentAction/History";
+import View from "../components/Dashboard/View";
 
 
 
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
     { index: true, element: <Tenant /> },
     {path:"history",element:<History/>},
     { path:"updatePassword",element:<UpdateTenantPassword/>},
+    { path:"viewTenants",element:<View/>},
     { path: "tenantstatistics", element: <TenantStatistics /> },
     { path: "tenantChat", element: <TenantChats /> },
     

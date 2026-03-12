@@ -75,9 +75,9 @@ const ManageUtilities = ({ tenant, close, fetch }) => {
         <div className="space-y-6">
 
          
-          <div className="flex justify-between items-center bg-yellow-50 p-5 rounded-xl border border-yellow-100 hover:shadow-md transition">
+          <div className="flex justify-between items-center bg-gradient-to-r from-yellow-100 to-amber-200 p-5 rounded-xl border border-yellow-100 hover:shadow-md transition">
             <div className="flex items-center gap-4">
-              <div className="bg-yellow-100 p-3 rounded-full">
+              <div className=" bg-yellow-100  p-3 rounded-full">
                 <FaRegLightbulb className="text-yellow-500 text-xl" />
               </div>
 
@@ -87,7 +87,7 @@ const ManageUtilities = ({ tenant, close, fetch }) => {
                 </h3>
                 <p className="text-sm text-gray-500">
                   Status:{" "}
-                  <span className={`font-medium ${electricity ? "text-green-600" : "text-red-500"}`}>
+                  <span fetch={fetch()} className={`font-medium ${electricity ? "text-green-600" : "text-red-500"}`}>
                     {electricity ? "ON" : "OFF"}
                   </span>
                 </p>
@@ -119,7 +119,7 @@ const ManageUtilities = ({ tenant, close, fetch }) => {
           </div>
 
          
-          <div className="flex justify-between items-center bg-blue-50 p-5 rounded-xl border border-blue-100 hover:shadow-md transition">
+          <div className="flex justify-between items-center bg-gradient-to-r from-blue-100 to-blue-200 p-5 rounded-xl border border-blue-100 hover:shadow-md transition">
             <div className="flex items-center gap-4">
               <div className="bg-blue-100 p-3 rounded-full">
                 <IoIosWater className="text-blue-500 text-xl" />
@@ -131,7 +131,7 @@ const ManageUtilities = ({ tenant, close, fetch }) => {
                 </h3>
                 <p className="text-sm text-gray-500">
                   Status:{" "}
-                  <span className={`font-medium ${water ? "text-green-600" : "text-red-500"}`}>
+                  <span fetch={fetch()} className={`font-medium ${water ? "text-green-600" : "text-red-500"}`}>
                     {water ? "ON" : "OFF"}
                   </span>
                 </p>

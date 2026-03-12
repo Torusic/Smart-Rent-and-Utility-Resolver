@@ -21,6 +21,7 @@ const Tenant = ({ onLogout,closeMenu }) => {
    
     { name: "Dashboard", path: "/tenantdashboard/tenantstatistics", icon: <MdDashboard size={20} /> },
     { name: "Chat", path: "/tenantdashboard/tenantChat", icon: <MdChat size={20} /> },
+     { name: "View Tenants", path: "/tenantdashboard/viewTenants", icon: <MdViewList size={20} /> },
     { name: "Update password", path: "/tenantdashboard/updatePassword", icon: <MdEdit size={20} /> },
       {name:"History", path: "/tenantdashboard/history",icon:<FaHistory size={20} />},
     { name: "Logout",  path:null, icon: <MdLogout size={20} /> },

@@ -4,6 +4,7 @@ import Axios from '../../utils/Axios'
 import SummaryApi from '../../common/SummaryApi'
 import toast from 'react-hot-toast'
 import { LuLoaderCircle } from 'react-icons/lu'
+import { IoEye, IoEyeOff } from 'react-icons/io5'
 
 const UpdateTenantPassword = () => {
 
@@ -18,7 +19,6 @@ const UpdateTenantPassword = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-
     setTenantUpdatePassword(prev => ({
       ...prev,
       [name]: value
@@ -26,19 +26,47 @@ const UpdateTenantPassword = () => {
   }
 
   const passwordStrength = () => {
-    const length = tenantUpdatePassword.newPassword.length
+    const password = tenantUpdatePassword.newPassword
 
-    if (length > 10) return "Strong"
-    if (length > 6) return "Medium"
-    if (length > 0) return "Weak"
+    const hasUpper = /[A-Z]/.test(password)
+    const hasLower = /[a-z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSpecial = /[!@#$%^&*]/.test(password)
+    const isLongEnough = password.length >= 8
+
+    const score = [hasUpper, hasLower, hasNumber, hasSpecial, isLongEnough]
+      .filter(Boolean).length
+
+    if (score >= 5) return "Strong"
+    if (score >= 3) return "Medium"
+    if (score >= 1) return "Weak"
     return ""
   }
+
+  const strength = passwordStrength()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    if (!tenantUpdatePassword.currentPassword ||
+        !tenantUpdatePassword.newPassword ||
+        !tenantUpdatePassword.confirmNewPassword) {
+      toast.error("All fields are required")
+      return
+    }
+
+    if (tenantUpdatePassword.currentPassword === tenantUpdatePassword.newPassword) {
+      toast.error("New password cannot be same as current password")
+      return
+    }
+
     if (tenantUpdatePassword.newPassword !== tenantUpdatePassword.confirmNewPassword) {
-      toast.error("Password dont match")
+      toast.error("Passwords do not match")
+      return
+    }
+
+    if (strength === "Weak") {
+      toast.error("Password is too weak")
       return
     }
 
@@ -53,149 +81,161 @@ const UpdateTenantPassword = () => {
       const { data: responseData } = response
 
       if (responseData.success) {
-        toast.success(responseData.message)
+        toast.success("Password updated successfully")
 
         setTenantUpdatePassword({
           currentPassword: "",
           newPassword: "",
           confirmNewPassword: ""
         })
+
+        setTimeout(() => {
+          
+          window.location.href = "/login"
+        }, 1500)
+      } else {
+        toast.error(responseData.message)
       }
 
     } catch (error) {
       AxiosToastError(error)
-
     } finally {
       setLoading(false)
     }
   }
 
-  const strength = passwordStrength()
-
   return (
-    <section className="h-full overflow-y-auto scrollbar-hidden flex justify-center items-center p-6 bg-gradient-to-br bg-white animate-gradient">
+    <section className="h-full overflow-y-auto scrollbar-hidden flex justify-center items-center p-6 bg-white">
 
-      <div className="w-full max-w-4xl backdrop-blur-xl mt-10 rounded-2xl border-l-4 border-gray-400 bg-white/70 
-        overflow-hidden transition-all duration-500">
+      <div className="w-full mr-90 backdrop-blur-xl mt-10 rounded-2xl border-l-4 border-gray-500 bg-white  overflow-hidden">
 
-        {/* Header */}
-        <div className="p-6 bg-gradient-to-r  text-gray-800 text-center">
-          <h2 className="text-xl font-bold  tracking-wide">
-            Update Your Password
+        <div className="p-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-800 tracking-wide">
+            Update Your Account Password
           </h2>
-          <p className="text-sm opacity-80 mt-1">
-            Secure your account with a strong password
+          <p className="text-sm text-gray-500 mt-2">
+            Keep your account secure by choosing a strong and unique password that protects your personal and financial information.
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="px-10 pb-10 space-y-6">
 
-          {/* Current Password */}
-          <div className="relative group">
-
+          <div className="relative">
             <input
-              type="text"
+              type={showPassword ? "text" : "password"}
               name="currentPassword"
               value={tenantUpdatePassword.currentPassword}
               onChange={handleChange}
-              className="peer w-full h-12 px-4 pt-4 bg-transparent border border-gray-200 rounded-xl
-              focus:border-green-400 outline-none transition-all duration-300"
+              className="peer w-full h-12 px-4 pt-4 border border-gray-300 rounded-xl focus:border-green-500 outline-none transition-all duration-300"
               placeholder=" "
             />
-
-            <label className="absolute left-4 top-2 text-xs text-gray-500
-            peer-focus:text-green-500 transition-all duration-300">
+            <label className="absolute left-4 top-2 text-xs text-gray-500 peer-focus:text-green-500">
               Current Password
             </label>
           </div>
 
-          {/* New Password */}
           <div className="relative">
-
             <input
               type={showPassword ? "text" : "password"}
               name="newPassword"
               value={tenantUpdatePassword.newPassword}
               onChange={handleChange}
-              className="peer w-full h-12 px-4 pt-4 bg-transparent border border-gray-200 rounded-xl
-              focus:border-green-400 outline-none transition-all duration-300"
+              className="peer w-full h-12 px-4 pt-4 border border-gray-300 rounded-xl focus:border-green-500 outline-none transition-all duration-300"
               placeholder=" "
             />
-
-            <label className="absolute left-4 top-2 text-xs text-gray-500
-            peer-focus:text-green-500">
+            <label className="absolute left-4 top-2 text-xs text-gray-500 peer-focus:text-green-500">
               New Password
             </label>
+
+            <p className="text-xs text-gray-500 mt-2">
+              Password must contain at least 8 characters including uppercase letters, lowercase letters, numbers and special symbols.
+            </p>
           </div>
 
-          {/* Confirm Password */}
           <div className="relative">
-
             <input
               type={showPassword ? "text" : "password"}
               name="confirmNewPassword"
               value={tenantUpdatePassword.confirmNewPassword}
               onChange={handleChange}
-              className="peer w-full h-12 px-4 pt-4 bg-transparent border border-gray-200 rounded-xl
-              focus:border-green-400 outline-none transition-all duration-300"
+              className="peer w-full h-12 px-4 pt-4 border border-gray-300 rounded-xl focus:border-green-500 outline-none transition-all duration-300"
               placeholder=" "
             />
-
-            <label className="absolute left-4 top-2 text-xs text-gray-500
-            peer-focus:text-green-500">
-              Confirm Password
+            <label className="absolute left-4 top-2 text-xs text-gray-500 peer-focus:text-green-500">
+              Confirm New Password
             </label>
+
+            {tenantUpdatePassword.confirmNewPassword &&
+             tenantUpdatePassword.newPassword !== tenantUpdatePassword.confirmNewPassword && (
+              <p className="text-xs text-red-500 mt-2">
+                The passwords entered do not match. Please ensure both fields are identical.
+              </p>
+            )}
           </div>
 
-          {/* Password Strength Indicator */}
           {tenantUpdatePassword.newPassword && (
             <div className="text-xs font-medium">
-
               <span className={
                 strength === "Strong" ? "text-green-600" :
-                  strength === "Medium" ? "text-yellow-500" :
-                    "text-red-500"
+                strength === "Medium" ? "text-yellow-500" :
+                "text-red-500"
               }>
                 Password Strength: {strength}
               </span>
 
-              <div className="h-1 mt-2 w-full bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-2 mt-2 w-full bg-gray-200 rounded-full overflow-hidden">
                 <div className={`h-full transition-all duration-500 ${
                   strength === "Strong" ? "w-full bg-green-500" :
-                    strength === "Medium" ? "w-2/3 bg-yellow-500" :
-                      "w-1/3 bg-red-500"
+                  strength === "Medium" ? "w-2/3 bg-yellow-500" :
+                  "w-1/3 bg-red-500"
                 }`} />
               </div>
             </div>
           )}
 
-          {/* Show Password */}
-          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer hover:text-green-500 transition">
-            <input
-              type="checkbox"
-              checked={showPassword}
-              onChange={() => setShowPassword(!showPassword)}
-              className="accent-green-500"
-            />
-            Show Passwords
-          </label>
+          <div className="flex items-center justify-between text-sm text-gray-600 mt-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+                className="accent-green-500"
+              />
+              Show Passwords
+            </label>
 
-          {/* Submit Button */}
+            <div className="flex items-center gap-1 text-gray-500">
+              {showPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
+              <span>Visibility</span>
+            </div>
+          </div>
+
           <button
-            disabled={loading}
-            className={`w-full flex justify-center items-center gap-2 py-3 rounded-xl
-            font-semibold transition-all duration-300 shadow-lg
-            ${loading
+            disabled={
+              loading ||
+              !tenantUpdatePassword.currentPassword ||
+              !tenantUpdatePassword.newPassword ||
+              !tenantUpdatePassword.confirmNewPassword ||
+              strength === "Weak"
+            }
+            className={`w-full flex justify-center items-center gap-2 py-3 rounded-xl font-semibold transition-all duration-300 ${
+              loading
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-green-500 to-emerald-500 hover:scale-[1.02] text-white"
-              }`}
+                : "bg-gradient-to-r from-green-500 to-emerald-600 hover:scale-[1.02] text-white shadow-md"
+            }`}
           >
             {loading ? (
               <LuLoaderCircle className="animate-spin" size={22} />
-            ) : "Update Password"}
+            ) : "Update Password Securely"}
           </button>
 
         </form>
+
+        <div className="px-10 pb-8 text-center text-xs text-gray-500">
+          After updating your password, you will automatically be logged out to ensure your account remains secure. 
+          Always keep your credentials confidential and avoid sharing your login details with anyone.
+        </div>
+
       </div>
     </section>
   )

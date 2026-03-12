@@ -4,10 +4,12 @@ import Axios from '../../utils/Axios'
 import SummaryApi from '../../common/SummaryApi'
 import toast from 'react-hot-toast'
 import { motion } from "framer-motion";
+import { LuLoaderCircle } from 'react-icons/lu'
 
 function UpdateTenants({ tenant, close,fetch }) {
 
     const tenantId = tenant?._id
+    const[loading,setLoading]=useState(false)
 
     const [tenantData, setTenantData] = useState({
         name: "",
@@ -37,6 +39,7 @@ function UpdateTenants({ tenant, close,fetch }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        setLoading(true)
 
         try {
             await Axios({
@@ -53,6 +56,8 @@ function UpdateTenants({ tenant, close,fetch }) {
 
         } catch (error) {
             toast.error("Failed to update tenant")
+        }finally{
+            setLoading(false)
         }
     }
      if (fetch) fetch()
@@ -125,8 +130,8 @@ function UpdateTenants({ tenant, close,fetch }) {
                     </div>
 
                     <div className='w-full mt-5 flex justify-center '>
-                        <button className='bg-green-500 w-full p-3 cursor-pointer font-semibold text-white rounded-lg'>
-                            Update
+                        <button className='bg-gradient-to-r from-green-500 flex justify-center items-center to-emerald-500 w-full p-3 cursor-pointer font-semibold text-white rounded-lg'>
+                            {loading ? <LuLoaderCircle size={26} className='animate-spin flex justify-center items-center' /> : "Update Tenant"}
                         </button>
                     </div>
 

@@ -10,6 +10,7 @@ async function connectDB(){
 
     } catch (error) {
         console.log("MongDB connection failed")
+        console.error("MongoDB connection failed:", error.message);
         
     }
 }

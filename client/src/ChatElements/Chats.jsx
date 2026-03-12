@@ -34,10 +34,7 @@ const Chats = ({ onSelectChat, activeChatId }) => {
     try {
       const response = await Axios(SummaryApi.view);
       if (response.data.tenants) {
-        const tenants = response.data.tenants.map((t) => ({
-          ...t,
-          unreadCount: 0,
-        }));
+       const tenants = response.data.tenants;
         setChats(sortChats(tenants));
       }
     } catch (error) {
@@ -57,10 +54,7 @@ const Chats = ({ onSelectChat, activeChatId }) => {
       });
 
       if (response.data.success) {
-        const tenants = response.data.tenants.map((t) => ({
-          ...t,
-          unreadCount: 0,
-        }));
+        const tenants = response.data.tenants;
         setChats(sortChats(tenants));
       } else {
         setChats([]);
@@ -72,18 +66,18 @@ const Chats = ({ onSelectChat, activeChatId }) => {
     }
   };
 
-  // Initial fetch
+  
   useEffect(() => {
     fetchChats();
   }, []);
 
-  // Search debounce
+  
   useEffect(() => {
     const delay = setTimeout(searchTenants, 500);
     return () => clearTimeout(delay);
   }, [query]);
 
-  // Socket listener for new messages
+  
   useEffect(() => {
     socket.on("newMessage", (message) => {
       setChats((prevChats) => {
@@ -120,7 +114,7 @@ const Chats = ({ onSelectChat, activeChatId }) => {
     return () => socket.off("newMessage");
   }, [activeChatId]);
 
-  // Handle chat click
+ 
   const handleSelectChat = (chat) => {
     setChats((prevChats) =>
       prevChats.map((c) =>
@@ -130,7 +124,6 @@ const Chats = ({ onSelectChat, activeChatId }) => {
     onSelectChat(chat);
   };
 
-  // Generate initials for avatar
   const getInitials = (name) => {
     if (!name) return "U";
     const names = name.split(" ");
@@ -180,11 +173,9 @@ const Chats = ({ onSelectChat, activeChatId }) => {
                 </div>
                 <div className="px-2 flex flex-col">
                   
-                  <span className="text-sm font-semibold text-black flex items-center  gap-2">
+                  <span className="text-sm font-semibold justify-between text-black flex items-center  gap-2">
                     {chat.name} 
-                    {chat.unreadCount > 0 && (
-                      <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-                    )}
+                    
                   </span>
                   {chat.lastMessage ? (
                     <span className="text-xs text-gray-700 truncate w-40">
@@ -198,6 +189,11 @@ const Chats = ({ onSelectChat, activeChatId }) => {
                 </div>
               </div>
               <div className="text-xs text-gray-700 whitespace-nowrap">
+                {chat.unreadCount > 0 && (
+                       <span className="w-3  ml-auto h-3 mb-1 text-xs bg-green-500 text-white rounded-full flex items-center justify-center">
+                        {/**{chat.unreadCount > 9 ? "9+":chat.unreadCount}*/}
+                        </span>
+                    )}
                 {chat.lastMessage?.createdAt
                   ? new Date(chat.lastMessage.createdAt).toLocaleTimeString(
                       [],

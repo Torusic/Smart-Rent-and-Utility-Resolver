@@ -62,8 +62,8 @@ function RentPayment({ close, refreshDashboard, balance }) {
   }
 
   return (
-    <div className='bg-neutral-950/70 z-50 top-0 left-0 right-0 bottom-0 fixed flex items-center justify-center'>
-      <div className='bg-white p-3 w-full max-w-md grid rounded-lg items-center'>
+    <div className='inset-0 bg-gray-700/60 backdrop-blur-sm z-50 top-0 left-0 right-0 bottom-0 fixed flex items-center justify-center'>
+      <div className='bg-white border-l-4 border-green-500 p-3 w-full max-w-md grid shadow-md rounded-2xl items-center'>
         <div className='flex justify-between items-center p-3'>
           <p className='text-sm font-semibold'>Make Rent Payment</p>
           <IoClose onClick={close} className='cursor-pointer'/>
@@ -71,17 +71,20 @@ function RentPayment({ close, refreshDashboard, balance }) {
 
         <form onSubmit={handlePayment}>
           <div className='p-2'>
-            <div className='flex justify-between items-center p-2 gap-1'>
-              <label className='text-sm font-semibold'>Amount:</label>
+            <div className='flex relative justify-between  items-center  rounded-lg p-2 gap-1'>
+           
               <input
                 type="number"
                 placeholder='Enter Amount...'
-                className='w-full p-1 text-black text-semibold outline-none py-3 border px-2 bg-gray-100 border-gray-300  rounded-lg'
+                className='peer w-full h-12 px-4 pt-4 text-sm text-gray-500  border bg-gray-50 border-gray-200 rounded-xl
+              focus:border-green-400 outline-none transition-all duration-300 '
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
               />
+                 <label className='absolute left-4 top-2 text-xs my-1 text-gray-500
+            peer-focus:text-green-500'>Amount:</label>
             </div>
-            <span className='flex gap-2 items-center text-red-400 p-2 justify-center mt-2 animate-pulse text-sm font-semibold'>
+            <span className='flex gap-2 items-center text-red-400 p-2 justify-center mt-2 animate-pulse text-xs font-semibold'>
               <IoMdInformationCircleOutline size={20}/> Only full Payment is allowed
             </span>
           </div>
@@ -89,7 +92,7 @@ function RentPayment({ close, refreshDashboard, balance }) {
           <div className='mt-5 flex p-2 justify-center items-center'>
             <button
               type="submit"
-              className={`bg-green-400 w-full text-white font-bold rounded p-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`bg-green-400 w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold rounded-lg p-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
               disabled={loading}
             >
               {loading ? "Processing..." : "Pay Rent"}

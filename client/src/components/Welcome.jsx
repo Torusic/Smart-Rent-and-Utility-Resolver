@@ -26,7 +26,7 @@ function Welcome() {
   return (
     <section className="w-full min-h-screen flex flex-col bg-gradient-to-br bg-white">
       <header className="container mx-auto flex justify-between items-center py-4 px-6 fade-in-stagger opacity-0 translate-y-10">
-        {/* Add logo or nav if needed */}
+        
       </header>
 
       <div className="flex flex-col lg:flex-row items-center justify-center flex-1 px-6 lg:px-20 gap-10 mt-10">
