@@ -66,7 +66,7 @@ const UpdateLandLordProfile = ({ dark }) => {
       <div className={`max-w-7xl mx-auto bg-white border-l-4  border-green-400  rounded-2xl p-8 
                       transition-all duration-500 `}>
                         <div className='flex items-center gap-3'>    
-                                <p onClick={() => window.history.back()} className="cursor-pointer  flex items-center rounded-lg bg-gray-300 p-2  text-gray-500 hover:text-gray-700"><BsArrowLeft size={20}/></p>
+                                <p onClick={() => window.history.back()} className="cursor-pointer  flex items-center rounded-lg bg-gray-100 p-2  text-gray-500 hover:text-gray-700"><BsArrowLeft size={20}/></p>
                                 <h2 className="text-2xl font-bold text-green-600  text-center flex items-center ">
                                   Update My Profile
                                 </h2>

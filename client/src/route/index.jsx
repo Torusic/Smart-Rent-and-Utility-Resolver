@@ -24,6 +24,7 @@ import Welcome from "../components/Welcome";
 import UpdateTenantPassword from "../components/Dashboard/updateTenantPassword";
 import History from "../components/Dashboard/PaymentAction/History";
 import View from "../components/Dashboard/View";
+import Logout from "../pages/Logout";
 
 
 
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
       element: <ChatLayout />,
       children: [{ path: ":chatId", element: <MessageChats /> }],
     },
+    {
+      path:"logout",
+      element:<Logout/>
+    }
   ],
 },
 {

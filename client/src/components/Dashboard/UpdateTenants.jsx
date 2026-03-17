@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { IoClose } from 'react-icons/io5'
+import { IoClose, IoInformationCircle, IoSyncCircleSharp } from 'react-icons/io5'
 import Axios from '../../utils/Axios'
 import SummaryApi from '../../common/SummaryApi'
 import toast from 'react-hot-toast'
 import { motion } from "framer-motion";
 import { LuLoaderCircle } from 'react-icons/lu'
+import { MdMarkEmailRead } from 'react-icons/md'
+import { FaHouseUser } from 'react-icons/fa'
 
-function UpdateTenants({ tenant, close,fetch }) {
+function UpdateTenants({ tenant, close, fetch }) {
 
     const tenantId = tenant?._id
-    const[loading,setLoading]=useState(false)
+    const [loading, setLoading] = useState(false)
 
     const [tenantData, setTenantData] = useState({
         name: "",
@@ -43,31 +45,30 @@ function UpdateTenants({ tenant, close,fetch }) {
 
         try {
             await Axios({
-              
                 url: `/api/LandLord/tenant/${tenantId}`,
-                method:"put",
+                method: "put",
                 data: tenantData,
                 withCredentials: true
             })
 
             toast.success("Tenant updated successfully")
-
             close && close()
 
         } catch (error) {
             toast.error("Failed to update tenant")
-        }finally{
+        } finally {
             setLoading(false)
         }
     }
-     if (fetch) fetch()
+
+    if (fetch) fetch()
 
     return (
-        <div className='fixed z-50 inset-0 backdrop-blur-sm flex justify-center items-center bg-gray-900/70'>
+        <div className='fixed z-70 inset-0 backdrop-blur-sm flex justify-center items-center p-2 bg-gray-900/70'>
             <motion.div
-            initial={{ opacity: 0, y: 40 }}
-             animate={{ opacity: 1, y: 0 }}
-             className='max-w-4xl w-full rounded-lg p-4 bg-white'>
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                className='max-w-4xl w-full rounded-lg p-4 bg-white'>
 
                 <div className='flex justify-between items-center'>
                     <h1 className="text-xl text-green-400 font-bold">
@@ -77,6 +78,13 @@ function UpdateTenants({ tenant, close,fetch }) {
                     <button onClick={close} className="text-xl">
                         <IoClose className='cursor-pointer' />
                     </button>
+                </div>
+
+                <div className='bg-green-50 border border-green-200 text-gray-700 text-xs p-3 rounded mt-3 space-y-1'>
+                    <p className='flex items-center gap-1'><IoInformationCircle size={16} className='text-green-500'/> Updating tenant details will immediately reflect in rent tracking and reports.</p>
+                    <p className='flex items-center gap-1'><MdMarkEmailRead size={16} className='text-green-500' />Changing email or phone may affect notifications and communication.</p>
+                    <p className='flex items-center gap-1'><FaHouseUser size={16} className='text-green-500'/> Changing room number will update room occupancy records.</p>
+                    <p className='flex items-center gap-1'><IoSyncCircleSharp size={16} className='text-green-500'/> Ensure all information is correct before saving changes.</p>
                 </div>
 
                 <form className='mt-4 p-2' onSubmit={handleSubmit}>
@@ -90,7 +98,7 @@ function UpdateTenants({ tenant, close,fetch }) {
                                 name="name"
                                 value={tenantData.name}
                                 onChange={handleChange}
-                                  className='px-2 py-3 border border-gray-200 font-normal  bg-gray-50 rounded-lg text-gray-600 outline-none'
+                                className='px-2 py-3 border border-gray-200 font-normal bg-gray-50 rounded-lg text-gray-600 outline-none'
                             />
                         </div>
 
@@ -101,7 +109,7 @@ function UpdateTenants({ tenant, close,fetch }) {
                                 name="email"
                                 value={tenantData.email}
                                 onChange={handleChange}
-                              className='px-2 py-3 border border-gray-200 font-normal  bg-gray-50 rounded-lg text-gray-600 outline-none'
+                                className='px-2 py-3 border border-gray-200 font-normal bg-gray-50 rounded-lg text-gray-600 outline-none'
                             />
                         </div>
 
@@ -123,7 +131,7 @@ function UpdateTenants({ tenant, close,fetch }) {
                                 name="room"
                                 value={tenantData.room}
                                 onChange={handleChange}
-                                  className='px-2 py-3 border border-gray-200 font-normal  bg-gray-50 rounded-lg text-gray-600 outline-none'
+                                className='px-2 py-3 border border-gray-200 font-normal bg-gray-50 rounded-lg text-gray-600 outline-none'
                             />
                         </div>
 

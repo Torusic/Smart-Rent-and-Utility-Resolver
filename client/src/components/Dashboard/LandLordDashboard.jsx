@@ -12,7 +12,7 @@ const LandLordDashboard = () => {
   return (
     <section className="h-screen flex flex-col bg-white via-transparent overflow-x-hidden">
       {/* Sticky header */}
-      <header className="h-20 bg-white z-50 shadow-md sticky top-0 flex items-center justify-between px-4">
+      <header className="h-20 bg-white z-60 shadow-sm  sticky top-0 flex items-center justify-between px-4">
         {/* Logo */}
         <img src={logo} alt="SmartRent" width={100} height={100} className="ml-2" />
 

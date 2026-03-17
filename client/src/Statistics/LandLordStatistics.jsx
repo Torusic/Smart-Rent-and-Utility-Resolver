@@ -4,11 +4,11 @@ import { MdBedroomParent } from "react-icons/md";
 import { AiOutlineFileUnknown } from "react-icons/ai";
 import { SiSimpleanalytics } from "react-icons/si";
 import { Link } from 'react-router-dom';
+import { motion } from "framer-motion";
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, ScatterChart, Scatter, ZAxis,
-  LineChart, Line, Legend
+  ResponsiveContainer, LineChart, Line, Legend
 } from "recharts";
 
 import Axios from '../utils/Axios';
@@ -18,48 +18,41 @@ import AxiosToastError from '../utils/AxiosToastError';
 import Divider from '../components/Divider';
 import ViewVaccant from '../components/ViewVaccant.jsx';
 
-const COLORS = ["#22c55e", "#dc2626", "#3b82f6", "#f59e0b"];
-
 const LandLordStatistics = () => {
 
   const [stats, setStats] = useState(null);
   const [scatterData, setScatterData] = useState([]);
   const [viewVaccants, setViewVaccants] = useState(false);
 
-  
-      const updateScatter = (data) => {
-        if (!data || !data.utilitiesGraph) return;
+  const updateScatter = (data) => {
+    if (!data || !data.utilitiesGraph) return;
 
-        const g = data.utilitiesGraph;
+    const g = data.utilitiesGraph;
 
-        setScatterData([
-          { x: 1, y: g.rent?.paid || 0, z: 200 },
-          { x: 2, y: g.rent?.unpaid || 0, z: 200 },
-          { x: 3, y: g.water?.paid || 0, z: 200 },
-          { x: 4, y: g.water?.unpaid || 0, z: 200 },
-          { x: 5, y: g.electricity?.paid || 0, z: 200 },
-          { x: 6, y: g.electricity?.unpaid || 0, z: 200 }
-        ]);
-      };
+    setScatterData([
+      { x: 1, y: g.rent?.paid || 0, z: 200 },
+      { x: 2, y: g.rent?.unpaid || 0, z: 200 },
+      { x: 3, y: g.water?.paid || 0, z: 200 },
+      { x: 4, y: g.water?.unpaid || 0, z: 200 },
+      { x: 5, y: g.electricity?.paid || 0, z: 200 },
+      { x: 6, y: g.electricity?.unpaid || 0, z: 200 }
+    ]);
+  };
 
   const fetchDashboard = async () => {
     try {
       const response = await Axios({ ...SummaryApi.landlordDashboard });
-
       if (response.data.success) {
         const data = response.data.data;
         setStats(data);
         updateScatter(data);
       }
-
     } catch (error) {
       AxiosToastError(error);
     }
   };
 
-  
   useEffect(() => {
-
     fetchDashboard();
 
     socket.on("statusUpdate", (data) => {
@@ -67,16 +60,14 @@ const LandLordStatistics = () => {
         if (!prev) return prev;
 
         const newStats = {
-            ...prev,
-            utilitiesGraph: {
-              ...prev.utilitiesGraph,
-              ...data.utilitiesGraph
-            }
-          };
-        
+          ...prev,
+          utilitiesGraph: {
+            ...prev.utilitiesGraph,
+            ...data.utilitiesGraph
+          }
+        };
 
         updateScatter(newStats);
-
         return newStats;
       });
     });
@@ -89,33 +80,26 @@ const LandLordStatistics = () => {
 
         if (data.rentedRooms !== undefined)
           newStats.rentedRooms = data.rentedRooms;
-
         if (data.vacantRooms !== undefined)
           newStats.vacantRooms = data.vacantRooms;
 
-        if (data.utilitiesGraph?.rent) {
-              newStats.utilitiesGraph.rent = {
-                ...newStats.utilitiesGraph?.rent,
-                ...data.utilitiesGraph.rent
-              };
-            }
-
-            if (data.utilitiesGraph?.water) {
-              newStats.utilitiesGraph.water = {
-                ...newStats.utilitiesGraph?.water,
-                ...data.utilitiesGraph.water
-              };
-            }
-
-            if (data.utilitiesGraph?.electricity) {
-              newStats.utilitiesGraph.electricity = {
-                ...newStats.utilitiesGraph?.electricity,
-                ...data.utilitiesGraph.electricity
-              };
-            }
+        if (data.utilitiesGraph?.rent)
+          newStats.utilitiesGraph.rent = {
+            ...newStats.utilitiesGraph?.rent,
+            ...data.utilitiesGraph.rent
+          };
+        if (data.utilitiesGraph?.water)
+          newStats.utilitiesGraph.water = {
+            ...newStats.utilitiesGraph?.water,
+            ...data.utilitiesGraph.water
+          };
+        if (data.utilitiesGraph?.electricity)
+          newStats.utilitiesGraph.electricity = {
+            ...newStats.utilitiesGraph?.electricity,
+            ...data.utilitiesGraph.electricity
+          };
 
         setTimeout(() => updateScatter(newStats), 0);
-
         return newStats;
       });
     });
@@ -124,7 +108,6 @@ const LandLordStatistics = () => {
       socket.off("statusUpdate");
       socket.off("paymentUpdate");
     };
-
   }, []);
 
   if (!stats) {
@@ -138,11 +121,7 @@ const LandLordStatistics = () => {
     );
   }
 
- 
-  
-
   const graph = stats.utilitiesGraph || {};
-
   const chartData = [
     { name: "Rent Paid", value: graph.rent?.paid || 0 },
     { name: "Rent Unpaid", value: graph.rent?.unpaid || 0 },
@@ -151,8 +130,6 @@ const LandLordStatistics = () => {
     { name: "Electricity Paid", value: graph.electricity?.paid || 0 },
     { name: "Electricity Unpaid", value: graph.electricity?.unpaid || 0 },
   ];
-
- 
 
   return (
     <div className="h-full overflow-y-auto scrollbar-hidden bg-gradient-to-br from-green-50 via-white to-green-100 p-4">
@@ -167,71 +144,70 @@ const LandLordStatistics = () => {
             Real-time landlord monitoring dashboard
           </p>
         </div>
-
         <SiSimpleanalytics className="text-green-500 text-2xl" />
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid md:grid-cols-3 gap-6">
+      {/* KPI Insights */}
+      <div className="grid md:grid-cols-3 gap-4 mb-6">
 
-        {/* Total Rooms */}
-        <div className="bg-white rounded-2xl shadow  border-l-4 rounded-2xl border-green-400  p-6 hover:shadow-xl transition">
-          <p className="text-sm text-gray-500">Total Rooms</p>
-          <h2 className="text-3xl font-bold text-green-600">
-            {stats.totalRooms}
-          </h2>
+        
 
-          <Link to="/landlorddashboard/update" className="flex justify-end mt-4">
-            <LuHousePlus
-              className="text-green-500 hover:scale-110 transition"
-              size={28}
-            />
-          </Link>
-        </div>
 
-        {/* Rented Rooms */}
-        <div className="bg-white  shadow  border-l-4 rounded-2xl border-blue-400 p-6 hover:shadow-xl transition">
-          <p className="text-sm text-gray-500">Rented Rooms</p>
-          <h2 className="text-3xl font-bold text-blue-600">
-            {stats.rentedRooms}
-          </h2>
-
-          <div className="flex justify-end mt-4">
-            <MdBedroomParent className="text-blue-500" size={40} />
+          {/* Occupancy Rate */}
+          <div className="bg-white p-4 rounded-2xl border-l-4 border-blue-500 shadow flex flex-col justify-between hover:shadow-xl transition">
+            <p className="text-xs text-gray-500">Occupancy Rate</p>
+            <h2 className="text-2xl font-bold text-blue-600">
+              {((stats.rentedRooms / stats.totalRooms) * 100).toFixed(1)}%
+            </h2>
+            <p className="text-xs text-gray-400">Rented vs Total Rooms</p>
+            <p className="text-xs text-gray-500 mt-2">
+              Guide: High occupancy means steady income. Aim to fill vacant rooms quickly.
+            
+            </p>
           </div>
-        </div>
 
-        {/* Vacant Rooms */}
-        <div className="bg-white  shadow border-l-4 rounded-2xl  border-red-400 p-6 hover:shadow-xl transition">
-          <button
-            onClick={() => setViewVaccants(true)}
-            className="text-sm text-gray-500 hover:text-green-600"
-          >
-            Vacant Rooms
-          </button>
-
-          <h2 className="text-3xl font-bold text-red-600">
-            {stats.vacantRooms}
-          </h2>
-
-          <div className="flex justify-end mt-4">
-            <AiOutlineFileUnknown className="text-red-500" size={40} />
+          {/* Unpaid Risk */}
+          <div className="bg-white p-4 rounded-2xl border-l-4 border-red-500 shadow flex flex-col justify-between hover:shadow-xl transition">
+            <p className="text-xs text-gray-500">Unpaid Risk</p>
+            <h2 className="text-2xl font-bold text-red-600">
+              {graph.rent?.unpaid || 0}% 
+            </h2>
+            <p className="text-xs text-gray-400">Rooms with overdue rent</p>
+            <p className="text-xs text-gray-500 mt-2">
+              Guide: Follow up quickly on overdue rent to avoid losses. 
+            </p>
           </div>
-        </div>
 
+          {/* Animated KPI Counter */}
+          <div className="bg-white p-4 rounded-2xl border-l-4 border-yellow-500 shadow flex flex-col justify-between hover:shadow-xl transition">
+            <p className="text-xs text-gray-500">Active Utilities</p>
+            <h2 className="text-2xl font-bold text-yellow-600">
+              <motion.span
+                initial={{ count: 0 }}
+                animate={{ count: (graph.water?.paid || 0) + (graph.electricity?.paid || 0) }}
+                transition={{ duration: 1.5 }}
+              >
+                {(graph.water?.paid || 0) + (graph.electricity?.paid || 0)}
+              </motion.span>
+            </h2>
+            <p className="text-xs text-gray-400">Paid utility records</p>
+            <p className="text-xs text-gray-500 mt-2">
+              Guide: Track utilities to avoid billing mistakes.
+            </p>
+          </div>
       </div>
 
       <Divider className="py-6" />
 
-      {/* Charts Section */}
+   
       <h1 className="p-2 font-semibold text-xs text-green-400 tracking-wide">
         UTILITY DISTRIBUTION ANALYTICS
       </h1>
 
       <div className="grid lg:grid-cols-2 gap-6 mt-2">
 
-        {/* Bar Chart */}
-        <div className="bg-white border-l-4 rounded-2xl border-green-400  shadow  p-6">
+        
+        <div className="bg-white border-l-4 rounded-2xl border-green-400 shadow p-6">
           <h2 className="font-semibold text-green-600 mb-4">
             Utilities Payment Bar Chart
           </h2>
@@ -242,17 +218,13 @@ const LandLordStatistics = () => {
               <XAxis dataKey="name" angle={-25} textAnchor="end" />
               <YAxis unit="%" />
               <Tooltip />
-              <Bar
-                dataKey="value"
-                fill="#22c55e"
-                radius={[6, 6, 0, 0]}
-              />
+              <Bar dataKey="value" fill="#22c55e" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Line Chart */}
-        <div className="bg-white border-l-4 rounded-2xl  shadow  border-yellow-400 p-6 h-[48vh]">
+       
+        <div className="bg-white border-l-4 rounded-2xl shadow border-yellow-400 p-6 h-[48vh]">
           <h2 className="font-semibold text-yellow-600 mb-4">
             Utilities Line Graph
           </h2>
@@ -264,18 +236,14 @@ const LandLordStatistics = () => {
               <YAxis unit="%" />
               <Tooltip />
               <Legend verticalAlign="bottom" height={36} />
-
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#f59e0b"
-                strokeWidth={3}
-              />
+              <Line type="monotone" dataKey="value" stroke="#f59e0b" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
       </div>
+      
+       
 
       {viewVaccants && (
         <ViewVaccant close={() => setViewVaccants(false)} />

@@ -18,7 +18,7 @@ const Landlord = ({ onLogout, closeMenu }) => {
   { name: "Chat", path: "/landlorddashboard/chat", icon: <MdChat size={20} /> },
     { name: "View Tenants", path: "/landlorddashboard/view", icon: <MdViewList size={20} /> },
     { name: "Update Profile", path: "/landlorddashboard/update", icon: <MdEdit size={20} /> },
-    { name: "Logout", path: null, icon: <MdLogout size={20} /> },
+    { name: "Logout", path:"/landlorddashboard/logout" , icon: <MdLogout size={20} /> },
   ];
 
   return (

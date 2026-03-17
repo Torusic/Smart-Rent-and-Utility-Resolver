@@ -15,7 +15,7 @@ const ViewVaccant = ({ close }) => {
       });
 
       if (response.data.success) {
-        setVacant(response.data.vacantRooms); // updated key
+        setVacant(response.data.vacantRooms); 
         toast.success(response.data.message);
       } else if (response.data.error) {
         toast.error(response.data.message || "No vacant rooms found");

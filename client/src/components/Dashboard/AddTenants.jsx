@@ -68,18 +68,17 @@ const AddTenants = () => {
   return (
     <section className="flex justify-center items-center  bg-gradient-to-br bg-white p-6">
 
-      {/* FORM CARD */}
       <div className="w-full border-l-4 rounded-2xl border-green-400 max-w-8xl bg-white p-10 ">
       
-        {/* TITLE */}
-        <p onClick={() => window.history.back()} className="cursor-pointer flex items-center w-10 text- rounded-lg bg-gray-300 p-2  text-black font-semibold"><BsArrowLeft size={20}/></p>
+        
+        <p onClick={() => window.history.back()} className="cursor-pointer flex items-center w-10 text- rounded-lg bg-gray-100 p-2  text-black font-semibold"><BsArrowLeft size={20}/></p>
         <h2 className="text-3xl font-bold text-green-600 text-center mb-10 tracking-wide">
           Add New Tenant
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
-          {/* NAME + EMAIL */}
+          
           <div className="grid md:grid-cols-2 gap-6">
 
             <div>
