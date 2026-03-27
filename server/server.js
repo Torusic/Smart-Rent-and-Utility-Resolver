@@ -39,8 +39,6 @@ app.use('/api/mpesa', mpesaRoute);
 app.use('/api/ai', aiRoute);
 
 
-
-
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -80,7 +78,7 @@ io.on("connection", (socket) => {
 
   // Frontend sends command to ESP32
   socket.on("controlCommand", ({ deviceId, command }) => {
-    console.log(` Command to ${deviceId}:`, command);
+    console.log(`⚡ Command to ${deviceId}:`, command);
     io.to(deviceId).emit("deviceCommand", command);
   });
 

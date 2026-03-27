@@ -1,4 +1,4 @@
-export const baseURL = "https://smart-rent-and-utility-resolver.onrender.com";
+export const baseURL = "http://localhost:5173";
 
 const SummaryApi = {
   /* ================= AUTH ================= */
