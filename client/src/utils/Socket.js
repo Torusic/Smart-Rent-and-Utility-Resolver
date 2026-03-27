@@ -1,6 +1,6 @@
 import {io} from 'socket.io-client';
 
-const socket = io("http://10.2.2.21:8080", {
+const socket = io("wss://smart-rent-and-utility-resolver.onrender.com", {
   transports: ["websocket"]
 });
 
