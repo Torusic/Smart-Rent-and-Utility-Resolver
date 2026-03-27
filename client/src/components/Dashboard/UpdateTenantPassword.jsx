@@ -105,9 +105,9 @@ const UpdateTenantPassword = () => {
   }
 
   return (
-    <section className="h-full overflow-y-auto scrollbar-hidden flex justify-center items-center p-6 bg-white">
+    <section className="h-full overflow-y-auto z-40 scrollbar-hidden flex justify-center items-center p-6 bg-white">
 
-      <div className="w-full mr-90 backdrop-blur-xl mt-10 rounded-2xl border-l-4 border-gray-500 bg-white  overflow-hidden">
+      <div className="w-full max-w-3xl mt-15    backdrop-blur-xl rounded-2xl border-l-4 border-gray-500 bg-white  overflow-hidden">
 
         <div className="p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-800 tracking-wide">

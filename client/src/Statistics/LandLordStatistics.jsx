@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { LuHousePlus, LuLoaderCircle } from "react-icons/lu";
+import { LuHousePlus, LuLoader, LuLoaderCircle } from "react-icons/lu";
 import { MdBedroomParent } from "react-icons/md";
 import { AiOutlineFileUnknown } from "react-icons/ai";
 import { SiSimpleanalytics } from "react-icons/si";
 import { Link } from 'react-router-dom';
-import { motion } from "framer-motion";
+import { motion, useMotionValue, animate } from "framer-motion";
 
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -113,9 +113,9 @@ const LandLordStatistics = () => {
   if (!stats) {
     return (
       <div className="text-center p-10 font-semibold text-green-500">
-        <p className="flex justify-center items-center gap-2">
-          <LuLoaderCircle size={25} className="animate-spin" />
-          Loading statistics...
+        <p className="flex justify-center items-center font-semibold text-sm  gap-2">
+          <LuLoader size={30} className="animate-spin text-green-500  rounded-full" />
+          
         </p>
       </div>
     );
@@ -148,7 +148,7 @@ const LandLordStatistics = () => {
       </div>
 
       {/* KPI Insights */}
-      <div className="grid md:grid-cols-3 gap-4 mb-6">
+      <div className="grid md:grid-cols-3 grid-cols-3 gap-4 mb-6">
 
         
 
@@ -160,7 +160,7 @@ const LandLordStatistics = () => {
               {((stats.rentedRooms / stats.totalRooms) * 100).toFixed(1)}%
             </h2>
             <p className="text-xs text-gray-400">Rented vs Total Rooms</p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 hidden lg:inline mt-2">
               Guide: High occupancy means steady income. Aim to fill vacant rooms quickly.
             
             </p>
@@ -170,10 +170,10 @@ const LandLordStatistics = () => {
           <div className="bg-white p-4 rounded-2xl border-l-4 border-red-500 shadow flex flex-col justify-between hover:shadow-xl transition">
             <p className="text-xs text-gray-500">Unpaid Risk</p>
             <h2 className="text-2xl font-bold text-red-600">
-              {graph.rent?.unpaid || 0}% 
+              {(graph.rent?.unpaid).toFixed(1) || 0}% 
             </h2>
             <p className="text-xs text-gray-400">Rooms with overdue rent</p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 hidden lg:inline mt-2">
               Guide: Follow up quickly on overdue rent to avoid losses. 
             </p>
           </div>
@@ -183,15 +183,15 @@ const LandLordStatistics = () => {
             <p className="text-xs text-gray-500">Active Utilities</p>
             <h2 className="text-2xl font-bold text-yellow-600">
               <motion.span
-                initial={{ count: 0 }}
-                animate={{ count: (graph.water?.paid || 0) + (graph.electricity?.paid || 0) }}
-                transition={{ duration: 1.5 }}
+               initial={{ opacity: 0, y: 40 }}
+               animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
               >
                 {(graph.water?.paid || 0) + (graph.electricity?.paid || 0)}
               </motion.span>
             </h2>
             <p className="text-xs text-gray-400">Paid utility records</p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-gray-500 hidden lg:inline mt-2">
               Guide: Track utilities to avoid billing mistakes.
             </p>
           </div>

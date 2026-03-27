@@ -4,6 +4,8 @@ import Axios from "../utils/Axios";
 import SummaryApi from "../common/SummaryApi";
 import toast from "react-hot-toast";
 import AxiosToastError from "../utils/AxiosToastError";
+import Feedback from "../components/Feedback";
+import Divider from "../components/Divider";
 
 const TenantChats = () => {
   const [messages, setMessages] = useState([]);
@@ -114,91 +116,105 @@ const TenantChats = () => {
   }
 
   return (
-    <section className="max-w-9xl mx-auto mt-2 ml-2 bg-white border-r-4 border-gray-400 mr-1 flex flex-col mb-6 h-[640px] rounded-2xl shadow-lg  overflow-hidden bg-gradient-to-t from-[#D1FAE5]">
+  <section className="max-w-9xl mx-auto mt- ml-2 overflow-y-auto scrollbar-hidden  mr-1 flex flex-col h-full rounded-2xl shadow-lg bg-gradient-to-t from-[#D1FAE5] overflow-hidden">
 
-      {/* HEADER */}
-      <header className="sticky top-0  bg-white  px-4 py-3 font-semibold shadow-sm">
-        Chat with
-        <span className="italic text-red-500 ml-2">
-          {landlord.name} (Landlord)
-        </span>
-      </header>
+    {/* HEADER */}
+    <header className="sticky top-0 bg-white px-4 py-3 font-semibold shadow-sm z-10">
+      Chat with
+      <span className="italic text-red-500 ml-2">
+        {landlord.name} (Landlord)
+      </span>
+    </header>
 
-      {/* CATEGORY SELECT */}
-      <div className="bg-white p-3">
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full p-3 rounded-xl  bg-gray-100  outline-none"
-        >
-          <option value=""> Select Category (Required)</option>
-          <option value="General">General</option>
-          <option value="Rent">Rent</option>
-          <option value="Electricity">Electricity</option>
-          <option value="Water">Water</option>
-          <option value="Maintenance">Maintenance</option>
-          <option value="Announcement">Announcement</option>
-        </select>
-      </div>
-
-      {/* MESSAGES */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto h-full p-4 space-y-3 bg-green-50 scrollbar-hidden scrollbar-thumb-green-300 scrollbar-track-green-100"
+    {/* CATEGORY */}
+    <div className="bg-white p-3">
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="w-full p-3 rounded-xl bg-gray-100 outline-none"
       >
-        {messages.length ? (
-          messages.map(msg => {
+        <option value=""> Select Category (Required)</option>
+        <option value="General">General</option>
+        <option value="Rent">Rent</option>
+        <option value="Electricity">Electricity</option>
+        <option value="Water">Water</option>
+        <option value="Maintenance">Maintenance</option>
+        <option value="Announcement">Announcement</option>
+      </select>
+    </div>
 
-            if (!msg?._id) return null;
+  
+    <div className="flex flex-1 overflow-hidden ">
 
-            return (
-              <div
-                key={msg._id}
-                className={`p-3 max-w-xs break-words text-sm shadow ${
-                  msg.senderModel === "Tenant"
-                    ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white ml-auto rounded-tr-3xl rounded-2xl border-l-4 border-green-600 h-20  rounded-tl-3xl rounded-br-3xl"
-                    : "bg-gradient-to-r from-gray-50 to-white  rounded-2xl border-l-4 border-gray-400 h-20 text-green-900 mr-auto rounded-tr-3xl rounded-tl-3xl rounded-bl-3xl"
-                }`}
-              >
-                <span className="text-[10px] px-2 py-1 bg-black/10 rounded-full">
-                  {msg.category || "General"}
-                </span>
+      
+      <div className="flex flex-col flex-1 h-full border-r-4 rounded-2xl border-gray-400  overflow-y-auto scrollbar-hidden">
 
-                <p className="mt-1">{msg.content}</p>
-              </div>
-            );
-          })
-        ) : (
-          <p className="text-gray-400 italic text-sm">
-            No messages yet...
-          </p>
-        )}
-      </div>
-
-      {/* INPUT AREA */}
-      <div className="bg-white p-3 flex gap-2 ">
-
-        <input
-          type="text"
-          value={input}
-          disabled={!category}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={category ? "Type message..." : "Select category first"}
-          onKeyDown={(e) => e.key === "Enter" && handleSend()}
-          className="flex-1 p-3 rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-green-300 disabled:opacity-50"
-        />
-
-        <button
-          onClick={handleSend}
-          disabled={!input.trim() || !category}
-          className="p-2 rounded-full bg-green-200 hover:bg-green-300 transition disabled:opacity-50"
+        {/* MESSAGES */}
+        <div
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto p-4 space-y-3 bg-green-50 scrollbar-hidden"
         >
-          <IoSend size={25} className="text-green-600" />
-        </button>
+          {messages.length ? (
+            messages.map(msg => {
+              if (!msg?._id) return null;
+
+              return (
+                <div
+                  key={msg._id}
+                  className={`p-3 max-w-xs break-words text-sm shadow ${
+                    msg.senderModel === "Tenant"
+                      ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white ml-auto rounded-2xl"
+                      : "bg-white text-green-900 mr-auto rounded-2xl"
+                  }`}
+                >
+                  <span className="text-[10px] px-2 py-1 bg-black/10 rounded-full">
+                    {msg.category || "General"}
+                  </span>
+
+                  <p className="mt-1">{msg.content}</p>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-gray-400 italic text-sm">
+              No messages yet...
+            </p>
+          )}
+        </div>
+
+        {/* INPUT */}
+        <div className="bg-white p-3 flex gap-2">
+          <input
+            type="text"
+            value={input}
+            disabled={!category}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={category ? "Type message..." : "Select category first"}
+            onKeyDown={(e) => e.key === "Enter" && handleSend()}
+            className="flex-1 p-3 rounded-xl bg-gray-100 outline-none focus:ring-2 focus:ring-green-300 disabled:opacity-50"
+          />
+
+          <button
+            onClick={handleSend}
+            disabled={!input.trim() || !category}
+            className="p-2 rounded-full bg-green-200 hover:bg-green-300 transition disabled:opacity-50"
+          >
+            <IoSend size={25} className="text-green-600" />
+          </button>
+        </div>
 
       </div>
-    </section>
-  );
+      
+
+      {/* FEEDBACK SECTION */}
+      <div className="w-[280px]  bg-white p-3 overflow-y-auto hidden md:block">
+        <Feedback />
+      </div>
+
+    </div>
+
+  </section>
+);
 };
 
 export default TenantChats;

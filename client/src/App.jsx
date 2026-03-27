@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import React, { useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { Socket } from "socket.io-client";
+import Tenant from "./role/Tenant";
 
 
 function App() {
@@ -19,7 +20,9 @@ function App() {
     <>
       <main>
         <Outlet />
+      
       </main>
+      
       <Toaster />
     </>
   );

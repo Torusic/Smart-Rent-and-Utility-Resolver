@@ -175,20 +175,81 @@ const ViewTenants = ({ fetchDashboard }) => {
   const currentTenants = data.slice(indexOfFirstTenant, indexOfLastTenant);
   const totalPages = Math.ceil(data.length / tenantsPerPage);
 
+  const exportCSV = () => {
+  if (!data.length) {
+    toast.error("No tenants to export");
+    return;
+  }
+
+  
+  const headers = [
+    "Name",
+    "Phone",
+    "Room",
+    "Total Rent",
+    "Amount Paid",
+    "Balance",
+    "Status",
+    "Move-In Date",
+    "Electricity",
+    "Water"
+  ];
+
+  const rows = data.map((tenant) => {
+    const totalRent = tenant.payment?.totalRent || 0;
+    const amountPaid = tenant.payment?.amountPaid || 0;
+    const balance = totalRent - amountPaid;
+    const rentStatus =
+      balance <= 0 ? "Paid" : amountPaid === 0 ? "Unpaid" : "Partial";
+
+    return [
+      tenant.name,
+      tenant.phone,
+      tenant.room,
+      totalRent,
+      amountPaid,
+      balance,
+      rentStatus,
+      new Date(tenant.createdAt).toLocaleString(),
+      tenant.utilities?.electricityStatus || "OFF",
+      tenant.utilities?.waterStatus || "OFF"
+    ];
+  });
+
+ 
+  const csvContent =
+    [headers, ...rows]
+      .map((row) => row.map((item) => `"${item}"`).join(","))
+      .join("\n");
+
+  
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", `tenants_${Date.now()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
   return (
-    <section className="bg-gray-50 h-full overflow-y-auto scrollbar-hidden p-6">
+    <section className="bg-gray-50 h-full overflow-y-auto scrollbar-hidden lg:p-6 p-2">
       {/* HEADER */}
-      <div className="bg-white rounded-2xl rounded-2xl border-l-4 border-green-500 shadow-md p-6 mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <div className="flex justify-between gap-2 items-center">
+      <div className="bg-white sticky top-0 rounded-2xl rounded-2xl border-l-4 border-green-500 shadow-md lg:p-6 p-2 mb-6">
+        <div className="flex  justify-between items-center gap-2 mb-2">
+          <div className="flex justify-between gap-3 items-center">
             <p onClick={() => window.history.back()} className="cursor-pointer flex items-center rounded-lg bg-gray-100 p-2  text-gray-500 hover:text-gray-700"><BsArrowLeft size={20}/></p>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+              <h2 className="lg:text-2xl text-xs font-bold text-gray-800 mb-4 flex items-center">
                 Tenant Management
              </h2>
              
             
           </div>
-          <div className="bg-gray-100 p-2 rounded-2xl border-l-4 border-green-500 grid">
+          </div>
+
+          <div className="flex  justify-between items-center gap-2 mb-2">
+            <div className="bg-gray-100 p-2 rounded-2xl border-l-4 border-green-500 grid">
             <p className="font-semibold text-sm py-2 text-green-500">key</p>
             <div className="flex gap-2 items-center justify-between">
               <p className="font-semibold text-gray-400 text-xs">⚡Electricity</p>
@@ -196,9 +257,24 @@ const ViewTenants = ({ fetchDashboard }) => {
             </div>
 
           </div>
+           <div className="lg:text-sm text-xs font-semibold flex items-center lg:gap-2 gap-2 text-gray-700">
+              Add tenant
+              <Link to="/landlorddashboard/addtenants" className="bg-gray-200 cursor-pointer p-2 rounded-lg flex items-center justify-center">
+                <IoMdAdd />
+              </Link>
+
+              <button
+                onClick={exportCSV}
+                className="bg-blue-100 text-blue-700 p-2 rounded-lg flex items-center justify-center hover:bg-blue-200"
+              >
+                Export CSV
+              </button>
+            </div>
+          </div>
+          
         
-        <p className="text-sm font-semibold flex items-center gap-2 text-gray-700 " >Add tenant<Link to="/landlorddashboard/addtenants" className="bg-gray-200 cursor-pointer p-2 rounded-lg"><IoMdAdd /></Link></p>
-        </div>
+       
+        
         
 
         <div className="flex  items-center bg-gray-100 rounded-xl px-4 py-2">
@@ -214,24 +290,24 @@ const ViewTenants = ({ fetchDashboard }) => {
       </div>
 
       {/* SUMMARY CARDS */}
-      <div className="grid md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-white p-6 rounded-2xl shadow border-l-4 border-green-500">
-          <p className="text-gray-500 text-sm">Total Expected Rent</p>
-          <h3 className="text-2xl font-bold text-green-600">
+      <div className="grid md:grid-cols-3  grid-cols-3 gap-6 mb-6">
+        <div className="bg-white grid items-center   lg:p-6  px-2  py-3 rounded-2xl shadow border-l-4 border-green-500">
+          <p className="text-gray-500 block text-xs">Total Expected Rent</p>
+          <h3 className="lg:text-2xl text-xs font-bold text-green-600">
             {formatCurrency(apartmentSummary.totalExpected)}
           </h3>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow border-l-4 border-blue-500">
+        <div className="bg-white p-6 grid items-center rounded-2xl shadow border-l-4 border-blue-500">
           <p className="text-gray-500 text-sm">Total Rent Paid</p>
-          <h3 className="text-2xl font-bold text-blue-600">
+          <h3 className="lg:text-2xl text-xs font-bold text-blue-600">
             {formatCurrency(apartmentSummary.totalPaid)}
           </h3>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow border-l-4 border-red-500">
+        <div className="bg-white p-6  grid items-center rounded-2xl shadow border-l-4 border-red-500">
           <p className="text-gray-500 text-sm">Total Unpaid Rent</p>
-          <h3 className="text-2xl font-bold text-red-600">
+          <h3 className="lg:text-2xl text-xs font-bold text-red-600">
             {formatCurrency(apartmentSummary.totalUnpaid)}
           </h3>
         </div>

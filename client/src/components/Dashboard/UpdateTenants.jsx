@@ -4,7 +4,7 @@ import Axios from '../../utils/Axios'
 import SummaryApi from '../../common/SummaryApi'
 import toast from 'react-hot-toast'
 import { motion } from "framer-motion";
-import { LuLoaderCircle } from 'react-icons/lu'
+import { LuLoader, LuLoaderCircle } from 'react-icons/lu'
 import { MdMarkEmailRead } from 'react-icons/md'
 import { FaHouseUser } from 'react-icons/fa'
 
@@ -71,7 +71,7 @@ function UpdateTenants({ tenant, close, fetch }) {
                 className='max-w-4xl w-full rounded-lg p-4 bg-white'>
 
                 <div className='flex justify-between items-center'>
-                    <h1 className="text-xl text-green-400 font-bold">
+                    <h1 className="lg:text-xl text-sm  text-green-400 font-bold">
                         Update tenant in room: {tenantData.room}
                     </h1>
 
@@ -89,7 +89,7 @@ function UpdateTenants({ tenant, close, fetch }) {
 
                 <form className='mt-4 p-2' onSubmit={handleSubmit}>
 
-                    <div className='grid grid-cols-2 gap-3 text-sm font-semibold text-gray-700'>
+                    <div className='grid grid-cols-2 gap-3 lg:text-sm text-xs font-semibold text-gray-700'>
 
                         <div className='grid gap-2'>
                             <label>Name</label>
@@ -139,7 +139,7 @@ function UpdateTenants({ tenant, close, fetch }) {
 
                     <div className='w-full mt-5 flex justify-center '>
                         <button className='bg-gradient-to-r from-green-500 flex justify-center items-center to-emerald-500 w-full p-3 cursor-pointer font-semibold text-white rounded-lg'>
-                            {loading ? <LuLoaderCircle size={26} className='animate-spin flex justify-center items-center' /> : "Update Tenant"}
+                            {loading ? <LuLoader size={26} className='animate-spin flex justify-center items-center' /> : "Update Tenant"}
                         </button>
                     </div>
 

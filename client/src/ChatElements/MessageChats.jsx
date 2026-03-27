@@ -115,7 +115,7 @@ const MessageChats = ({ chat }) => {
   }
 
   return (
-    <section className="w-full h-[630px] ml-6 flex flex-col border-r-4 rounded-2xl border-gray-400   rounded-2xl overflow-hidden bg-gradient-to-t from-green-100 to-green-50 shadow">
+    <section className="w-full h-[630px]  flex flex-col border-r-4 rounded-2xl border-gray-400   rounded-2xl overflow-hidden bg-gradient-to-t from-green-100 to-green-50 shadow">
      
         <header className="sticky top-0 z-10 bg-white  px-4 py-3 flex flex-col gap-1 shadow-sm">
         <div className="font-semibold">

@@ -114,15 +114,15 @@ const TenantStatistics = () => {
   const handleClose = () => setBroadcast(null)
 
   return (
-    <section className='bg-white items-center overflow-y-auto scrollbar-hidden h-full s px-2 py-2 justify-center' >
+    <section className='bg-white items-center overflow-y-auto  scrollbar-hidden h-full s px-2 py-2 justify-center' >
       
       {/* Broadcast */}
       {broadcast && (
-        <div className="bg-gray-100 rounded-2xl border-l-4 border-gray-400 top-1 z-50 sticky lg:w-full w-88 text-sm p-1 flex items-center">
-          <span className="font-semibold  text-red-600 px-2 py-1">
+        <div className="bg-gray-100  rounded-2xl lg:text-sm text-xs   border-l-4 border-gray-400 top-1 z-30 sticky lg:w-full w-88  p-1 flex items-center">
+          <span className="font-semibold   text-red-600 px-2 py-1">
             {broadcast.content}
           </span>
-          <small className="text-gray-400 px-2">
+          <small className="text-gray-400 s  px-2">
             {new Date(broadcast.createdAt).toLocaleString()}
           </small>
           <button className="ml-auto text-red-400 cursor-pointer" onClick={handleClose}>
@@ -130,13 +130,18 @@ const TenantStatistics = () => {
           </button>
         </div>
       )}
+      {loading && (
+        <div className='flex justify-center items-center mt-4'>
+          <LuLoader size={40} className='animate-spin text-green-400' />
+        </div>
+      )}
 
       {/* Welcome */}
-        <p className='font-bold text-2xl rounded-2xl border--4 border-green-400  lg:text-2xl justify-center py-3 px-3 flex items-center text-gray-800' >
+        <p className='font-bold lg:text-2xl  rounded-2xl border--4 border-green-400  text-xs justify-center py-3 px-3 flex items-center text-gray-800' >
         Welcome to Your Smart Home experience
         <span className='px-3 text-yellow-400 flex gap-2'><FaStar /><FaStar /><FaStarHalfAlt /></span>
       </p>
-       <span className='p-3 font-semibold flex items-center gap-3'>Choose Payment <FaWallet size={20} /></span>
+       <span className='p-3 font-semibold lg:text-xl text-xs flex items-center gap-3'>Choose Payment <FaWallet size={20} /></span>
       
       
       <div className='p-3  inset-0  bg-white lg:flex justify-between'>
@@ -173,7 +178,7 @@ const TenantStatistics = () => {
               className='bg-gradient-to-r from-green-500 to-emerald-500 text-sm text-white py-3 font-semibold cursor-pointer px-3 rounded-full w-40'
               onClick={() => setRentModal(true)}
             >
-              Make Payments
+              Make Payments 
             </button>
           </div>
         </div>
@@ -196,8 +201,8 @@ const TenantStatistics = () => {
             
           </div>
           <div className='flex justify-center items-center mt-8'>
-            <button className='bg-gradient-to-r from-yellow-500 to-amber-500 text-sm text-white py-3 font-semibold cursor-pointer px-3 rounded-full w-40'>
-              Make Payment
+            <button className='bg-gradient-to-r from-yellow-500 flex items-center gap-1 to-amber-500 text-sm text-white py-3 font-semibold cursor-pointer px-3 rounded-full w-50'>
+              Make Payment <p className='italic text-xs font-normal'>(coming soon)</p>
             </button>
           </div>
         </div>
@@ -220,8 +225,8 @@ const TenantStatistics = () => {
            
           </div>
           <div className='flex justify-center p-2 items-center mt-8'>
-            <button className='bg-gradient-to-r from-blue-500 to-blue-600 text-sm text-white py-3 font-bold cursor-pointer px-3 rounded-full w-40'>
-              Make Payment
+            <button className='bg-gradient-to-r from-blue-500 flex items-center gap-1 to-blue-600 text-sm text-white py-3 font-bold cursor-pointer px-3 rounded-full w-50'>
+              Make Payment <p className='italic text-xs font-normal'>(coming soon)</p>
             </button>
           </div>
         </div>
@@ -237,11 +242,7 @@ const TenantStatistics = () => {
     </div>
      
 
-      {loading && (
-        <div className='flex justify-center items-center mt-4'>
-          <LuLoader size={40} className='animate-spin text-green-400' />
-        </div>
-      )}
+      
            
 
     {rentModal && (

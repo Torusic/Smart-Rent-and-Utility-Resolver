@@ -11,7 +11,7 @@ const TenantDashboard = () => {
   const [isOpen, setIsOpen] = useState(false); // Sidebar toggle for mobile
 
   return (
-    <section className="h-screen w-screen bg-white flex flex-col overflow-x-hidden">
+    <section className="h-screen w-screen bg-white lg:flex lg:flex-col grid overflow-x-hidden">
       {/* Sticky header */}
       <header className="h-20 bg-white z-50 shadow-md sticky top-0 flex items-center justify-between px-4">
         {/* Logo */}
@@ -32,7 +32,7 @@ const TenantDashboard = () => {
         {/* Sidebar */}
         <aside
           className={`
-            fixed lg:static top-20  left-0 screen w-56 bg-white shadow-md 
+            fixed lg:static top-20 bottom-0  left-0 screen w-56 bg-white shadow-md 
             transform transition-transform duration-300 ease-in-out 
             ${isOpen ? "translate-x-0" : "-translate-x-full"} 
             lg:translate-x-0 lg:block

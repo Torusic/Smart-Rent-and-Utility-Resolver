@@ -133,7 +133,7 @@ const Chats = ({ onSelectChat, activeChatId }) => {
   };
 
   return (
-    <div className="lg:shadow-md py-1 z-50 rounded-t-2xl w-90 rounded-b-2xl   border-t-5 border-b-5 border-green-500 h-full bg-white  lg:px-2 ml-0">
+    <div className="lg:shadow-md py-1 px-2 z-50 rounded-t-2xl w-90 rounded-b-2xl   border-t-5 border-b-5 border-green-500 h-full bg-white  lg:px-2 ml-0">
       <h2 className="font-bold text-sm p-2 text-green-400">Chats</h2>
 
       {/* Search */}

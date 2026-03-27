@@ -14,7 +14,7 @@ const Action = ({ close, cancel, confirm }) => {
       <div className="w-full max-w-xl bg-white rounded-lg shadow-2xl overflow-hidden animate-fadeIn">
 
         <div className="flex justify-between items-center p-5">
-          <div className="flex items-center gap-2 text-sx text-red-500 font-bold">
+          <div className="flex items-center gap-2 text-sm lg:text-lg text-red-500 font-bold">
             <HiOutlineExclamationCircle size={26} />
             <span>Tenant Removal</span>
           </div>
@@ -30,7 +30,7 @@ const Action = ({ close, cancel, confirm }) => {
 
           <div className="flex justify-center">
             <BsFillExclamationTriangleFill
-              size={70}
+              size={40}
               className="text-red-400 animate-pulse"
             />
           </div>

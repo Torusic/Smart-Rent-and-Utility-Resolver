@@ -45,7 +45,7 @@ function RentPayment({ close, refreshDashboard, balance }) {
               refreshDashboard(window.dispatchEvent(new Event("paymentSuccess"))) // update parent dashboard
               toast.success("Payment confirmed!")
               clearInterval(interval)
-              close() // close modal after successful payment
+              close() 
             }
           } catch (err) {
             AxiosToastError(err)
@@ -62,7 +62,7 @@ function RentPayment({ close, refreshDashboard, balance }) {
   }
 
   return (
-    <div className='inset-0 bg-gray-700/60 backdrop-blur-sm z-50 top-0 left-0 right-0 bottom-0 fixed flex items-center justify-center'>
+    <div className='inset-0 bg-gray-700/60 backdrop-blur-sm z-50 top-0 left-0 p-7 right-0 bottom-0 fixed flex items-center justify-center'>
       <div className='bg-white border-l-4 border-green-500 p-3 w-full max-w-md grid shadow-md rounded-2xl items-center'>
         <div className='flex justify-between items-center p-3'>
           <p className='text-sm font-semibold'>Make Rent Payment</p>

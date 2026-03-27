@@ -1,30 +1,39 @@
-import React from 'react'
-import { IoMdInformationCircleOutline } from 'react-icons/io';
-import { IoSend } from 'react-icons/io5';
+import React from "react";
+import { IoMdInformationCircleOutline } from "react-icons/io";
+import { IoSend } from "react-icons/io5";
 import { VscFeedback } from "react-icons/vsc";
 
 function Feedback() {
   return (
-    <section className='bg-green-100 py-2 '>
-         <div className=' p-3 rounded bg-green-100 shadow-neutral-400 shadow-md'>
-        <p className='font-semibold flex items-center gap-3 py-2'>Feedback <VscFeedback size={20} /></p>
-        <div className='bg-green-50 flex items-center px-2'>
-            <input type="text" placeholder='Give feedback...' className=' l w-full outline-none rounded p-2'/>
-              <IoSend className='text-green-400' />
-              </div>
-        <span className='flex items-center gap-1 italic text-sm font-semibold py-1'>
-            <IoMdInformationCircleOutline size={20} />
-            Note: Only feedback or recommendations about the system may be sent. For any other messages, kindly contact the landlord directly.
-            </span>
-          
+    <section className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <p className="font-semibold text-gray-800 flex items-center gap-2">
+          Feedback
+          <VscFeedback size={18} className="text-green-500" />
+        </p>
+      </div>
 
-        
-       
-        </div>
-        
+      <div className="flex items-center gap-2 bg-gray-100 rounded-xl px-3 py-2 focus-within:ring-2 focus-within:ring-green-400 transition">
+        <input
+          type="text"
+          placeholder="Share your thoughts..."
+          className="flex-1 bg-transparent outline-none text-sm text-gray-700 placeholder-gray-400"
+        />
+
+        <button className="p-2 rounded-lg bg-green-500 hover:bg-green-600 transition shadow-sm">
+          <IoSend className="text-white" size={18} />
+        </button>
+      </div>
+
+      <div className="flex items-start gap-2 text-xs text-gray-500 leading-relaxed">
+        <IoMdInformationCircleOutline size={18} className="mt-[2px]" />
+        <p>
+          Only system-related feedback is allowed. For other concerns, please
+          contact your landlord directly via chat.
+        </p>
+      </div>
     </section>
-   
-  )
+  );
 }
 
-export default Feedback
+export default Feedback;

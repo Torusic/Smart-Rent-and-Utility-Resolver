@@ -2,10 +2,34 @@ import React from 'react'
 import { BsArrowLeft } from 'react-icons/bs'
 import { IoIosKey, IoIosLock, IoIosSave } from 'react-icons/io'
 import { IoClose } from 'react-icons/io5'
+import { useNavigate } from 'react-router-dom'
+import AxiosToastError from '../utils/AxiosToastError'
+import Axios from '../utils/Axios'
+import SummaryApi from '../common/SummaryApi'
+import toast from 'react-hot-toast'
 
-const Logout = () => {
+const Logout = ({close}) => {
+
+  const navigate=useNavigate()
+
+  const handleLogout=async()=>{
+    try {
+      const response=await Axios({
+        ...SummaryApi.logout
+      })
+      if(response.data.success){
+        toast.success(response.data.message)
+        navigate('/welcome')
+      }
+      
+    } catch (error) {
+      AxiosToastError(error)
+      
+    }
+  }
+  
   return (
-    <section className='fixed top-0 bottom-0 right-0 left-0 bg-gray-900/60 p-2 z-70 flex items-center justify-center'>
+    <section className='fixed top-0 bottom-0 right-0 left-0 bg-gray-900/60 p-7 z-70 flex items-center justify-center'>
       <div className='bg-white p-6 max-w-md w-full rounded-xl shadow-lg'>
         
         <div className='flex justify-between items-center mb-3'>
@@ -17,7 +41,7 @@ const Logout = () => {
           </p>
 
           <button className='text-gray-500 hover:text-gray-800'>
-            <IoClose size={22}/>
+            <IoClose size={22} onClick={() => window.history.back()}/>
           </button>
         </div>
 
@@ -45,6 +69,7 @@ const Logout = () => {
           </button>
 
           <button 
+          onClick={handleLogout}
             className='px-4 py-2 bg-red-500 text-white rounded cursor-pointer hover:bg-red-600'
           >
             Logout

@@ -82,7 +82,10 @@ const router = createBrowserRouter([
     { path:"viewTenants",element:<View/>},
     { path: "tenantstatistics", element: <TenantStatistics /> },
     { path: "tenantChat", element: <TenantChats /> },
-    
+     {
+      path:"logout",
+      element:<Logout/>
+    }
   ],
 }
 ,

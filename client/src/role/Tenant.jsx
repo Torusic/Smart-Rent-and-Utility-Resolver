@@ -24,11 +24,11 @@ const Tenant = ({ onLogout,closeMenu }) => {
      { name: "View Tenants", path: "/tenantdashboard/viewTenants", icon: <MdViewList size={20} /> },
     { name: "Update password", path: "/tenantdashboard/updatePassword", icon: <MdEdit size={20} /> },
       {name:"History", path: "/tenantdashboard/history",icon:<FaHistory size={20} />},
-    { name: "Logout",  path:null, icon: <MdLogout size={20} /> },
+    { name: "Logout", path:"/landlorddashboard/logout" , icon: <MdLogout size={20} /> },
   ];
 
   return (
-    <aside className="w-48  z-50 flex flex-col justify-between  lg:h-full h-190  bg-white via-transparent py-6  ">
+    <aside className="lg:w-48  z-50 flex lg:flex-col bottom-0 left-0 right-0    justify-between  lg:h-full h-190  bg-white via-transparent py-6  ">
       <ul className="space-y-2">
         {menu.map((item, i) => {
           // route-aware active: if path exists and current path starts with item.path

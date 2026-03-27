@@ -220,6 +220,54 @@ export async function commonLoginController(req, res) {
     });
   }
 }
+export async function logoutController(req, res) {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+        error: true,
+        success: false,
+      });
+    }
+
+    const cookiesOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    };
+
+  
+    res.clearCookie("accessToken", cookiesOptions);
+    res.clearCookie("refreshToken", cookiesOptions);
+
+    
+    let user = await TenantModel.findByIdAndUpdate(userId, {
+      refresh_token: "",
+    });
+
+   
+    if (!user) {
+      user = await LandLord.findByIdAndUpdate(userId, {
+        refresh_token: "",
+      });
+    }
+
+    return res.status(200).json({
+      message: "User logged out successfully",
+      error: false,
+      success: true,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+      error: true,
+      success: false,
+    });
+  }
+}
 
 export async function addTenantController(req, res) {
   try {

@@ -10,6 +10,11 @@ const SummaryApi = {
     url: "/api/LandLord/login",
     method: "post",
   },
+  logout:{
+    url:"/api/LandLord/logout",
+    method:"get"
+
+  },
 
   /* ================= LANDLORD ================= */
   landlordDashboard: {

@@ -66,20 +66,20 @@ const AddTenants = () => {
 };
 
   return (
-    <section className="flex justify-center items-center  bg-gradient-to-br bg-white p-6">
+    <section className="flex justify-center overflow-x-auto scrollbar-hidden h-full  items-center  bg-gradient-to-br bg-white p-6">
 
-      <div className="w-full border-l-4 rounded-2xl border-green-400 max-w-8xl bg-white p-10 ">
+      <div className="w-full  border-l-4 rounded-2xl border-green-400 max-w-8xl bg-white lg:p-10 p-3 ">
       
         
-        <p onClick={() => window.history.back()} className="cursor-pointer flex items-center w-10 text- rounded-lg bg-gray-100 p-2  text-black font-semibold"><BsArrowLeft size={20}/></p>
-        <h2 className="text-3xl font-bold text-green-600 text-center mb-10 tracking-wide">
+        <p onClick={() => window.history.back()} className="cursor-pointer flex items-center w-10 text-xs rounded-lg bg-gray-100 p-2  text-black font-semibold"><BsArrowLeft size={20}/></p>
+        <h2 className="lg:text-3xl text-sm font-bold text-green-600 text-center mb-10 tracking-wide">
           Add New Tenant
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
 
           
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:text-sm text-xs lg:gap-6 gap-2">
 
             <div>
               <label className="font-semibold text-gray-600 mb-2 block">
@@ -98,7 +98,7 @@ const AddTenants = () => {
             </div>
 
             <div>
-              <label className="font-semibold text-gray-600 mb-2 block">
+              <label className="font-semibold text-gray-600  mb-2 block">
                 Email
               </label>
 
@@ -116,7 +116,7 @@ const AddTenants = () => {
           </div>
 
           {/* PHONE + ROOM */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 lg:text-sm text-xs lg:gap-6 gap-2">
 
             <div>
               <label className="font-semibold text-gray-600 mb-2 block">
@@ -154,7 +154,7 @@ const AddTenants = () => {
 
           {/* RENT */}
           <div>
-            <label className="font-semibold text-gray-600 mb-2 block">
+            <label className="font-semibold text-gray-600 lg:text-sm text-xs mb-2 block">
               Monthly Rent Amount *
             </label>
 
@@ -173,7 +173,7 @@ const AddTenants = () => {
          <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-4 rounded-xl font-semibold text-lg hover:bg-green-700 transition hover:scale-[1.02] active:scale-95 shadow-md disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-500 text-white py-4 rounded-xl font-semibold text-xs lg:text-lg hover:bg-green-700 transition hover:scale-[1.02] active:scale-95 shadow-md disabled:opacity-50"
             >
               {loading ? "Processing..." : "Add Tenant"}
           </button>
